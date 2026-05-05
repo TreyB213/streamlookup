@@ -1,0 +1,25 @@
+{
+  "overview": "StreamLookup is a Netflix-style streaming hub powered by TMDB. The homepage auto-populates with trending and popular movies and TV shows, complete with poster images. Users can search by title (e.g. 'mario', 'sonic') to find and watch any movie or series, or paste an IMDb URL or tt ID directly. Clicking any title loads a full embedded video player with a dropdown of 10+ streaming servers — last-used server is remembered automatically.",
+  "features": [
+    "TMDB-powered homepage with trending and popular content rows",
+    "Search by title — poster grid results, click to watch",
+    "IMDb URL and tt ID direct lookup",
+    "Embedded video player with 10+ server sources (VidSrc, 2Embed, VidFast, AutoEmbed, and more)",
+    "Server selection persists to localStorage",
+    "Season and episode selector for TV series",
+    "Dark cinematic theme with theater red and gold accents",
+    "Responsive horizontal-scrolling content rows"
+  ],
+  "category": "entertainment",
+  "tags": [
+    "streaming",
+    "movies",
+    "tv",
+    "tmdb",
+    "player",
+    "search",
+    "dark-theme",
+    "embed"
+  ],
+  "last_updated": "2026-05-04T16:21:58.393Z"
+}
