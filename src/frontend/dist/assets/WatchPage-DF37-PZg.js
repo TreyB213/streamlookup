@@ -1,6 +1,6 @@
-import { c as createLucideIcon, y as watchRoute, u as useNavigate, r as reactExports, j as jsxRuntimeExports, F as Film, d as Search } from "./index-BPdK22S0.js";
-import { A as ArrowLeft, C as CircleAlert } from "./circle-alert-BQvdITG_.js";
-import { T as Tv, m as motion } from "./proxy-Db3Nka8V.js";
+import { c as createLucideIcon, y as watchRoute, u as useNavigate, r as reactExports, j as jsxRuntimeExports, F as Film, d as Search } from "./index-Q3s0jndP.js";
+import { A as ArrowLeft, C as CircleAlert } from "./circle-alert-oOjoVqHy.js";
+import { T as Tv, m as motion } from "./proxy-B7LpWIzE.js";
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -54,47 +54,25 @@ function getEpisode(ctx) {
 }
 const SERVERS = [
   {
+    id: "vidsrc-to",
+    name: "VidSrc.to ★",
+    buildUrl: (ctx) => {
+      if (ctx.mediaType === "movie") {
+        return `https://vidsrc.to/embed/movie/${ctx.imdbId}`;
+      }
+      const ep = getEpisode(ctx);
+      return `https://vidsrc.to/embed/tv/${ctx.imdbId}/${ep.season}/${ep.episode}`;
+    }
+  },
+  {
     id: "vidsrcme",
     name: "VidSrc.me",
     buildUrl: (ctx) => {
       if (ctx.mediaType === "movie") {
-        return `https://vidsrcme.ru/embed/movie?imdb=${ctx.imdbId}`;
+        return `https://vidsrc.me/embed/movie?imdb=${ctx.imdbId}`;
       }
       const ep = getEpisode(ctx);
-      return `https://vidsrcme.ru/embed/tv?imdb=${ctx.imdbId}&season=${ep.season}&episode=${ep.episode}`;
-    }
-  },
-  {
-    id: "vidsrc-embed-ru",
-    name: "VidSrc (ru)",
-    buildUrl: (ctx) => {
-      if (ctx.mediaType === "movie") {
-        return `https://vidsrc-embed.ru/embed/${ctx.imdbId}/`;
-      }
-      const ep = getEpisode(ctx);
-      return `https://vidsrc-embed.ru/embed/${ctx.imdbId}/${ep.season}-${ep.episode}/`;
-    }
-  },
-  {
-    id: "vidsrc-embed-su",
-    name: "VidSrc (su)",
-    buildUrl: (ctx) => {
-      if (ctx.mediaType === "movie") {
-        return `https://vidsrc-embed.su/embed/${ctx.imdbId}/`;
-      }
-      const ep = getEpisode(ctx);
-      return `https://vidsrc-embed.su/embed/${ctx.imdbId}/${ep.season}-${ep.episode}/`;
-    }
-  },
-  {
-    id: "111movies",
-    name: "111Movies",
-    buildUrl: (ctx) => {
-      if (ctx.mediaType === "movie") {
-        return `https://111movies.com/movie/${ctx.imdbId}`;
-      }
-      const ep = getEpisode(ctx);
-      return `https://111movies.com/tv/${ctx.imdbId}/${ep.season}/${ep.episode}`;
+      return `https://vidsrc.me/embed/tv?imdb=${ctx.imdbId}&season=${ep.season}&episode=${ep.episode}`;
     }
   },
   {
@@ -120,17 +98,6 @@ const SERVERS = [
     }
   },
   {
-    id: "vidsrc-mov",
-    name: "VidSrc (mov)",
-    buildUrl: (ctx) => {
-      if (ctx.mediaType === "movie") {
-        return `https://vidsrc.mov/embed/movie/${ctx.imdbId}`;
-      }
-      const ep = getEpisode(ctx);
-      return `https://vidsrc.mov/embed/tv/${ctx.imdbId}/${ep.season}/${ep.episode}`;
-    }
-  },
-  {
     id: "autoembed",
     name: "AutoEmbed",
     buildUrl: (ctx) => {
@@ -142,19 +109,19 @@ const SERVERS = [
     }
   },
   {
-    id: "embedmaster",
-    name: "EmbedMaster",
+    id: "embed-su",
+    name: "EmbedSU",
     buildUrl: (ctx) => {
       if (ctx.mediaType === "movie") {
-        return `https://embedmaster.link/movie/${ctx.imdbId}`;
+        return `https://embed.su/embed/movie/${ctx.imdbId}`;
       }
       const ep = getEpisode(ctx);
-      return `https://embedmaster.link/tv/${ctx.imdbId}/${ep.season}/${ep.episode}`;
+      return `https://embed.su/embed/tv/${ctx.imdbId}/${ep.season}/${ep.episode}`;
     }
   },
   {
-    id: "multiembed",
-    name: "MultiEmbed",
+    id: "superembed",
+    name: "SuperEmbed",
     buildUrl: (ctx) => {
       const params = new URLSearchParams({ video_id: ctx.imdbId, tmdb: "0" });
       if (ctx.mediaType !== "movie") {
@@ -163,6 +130,39 @@ const SERVERS = [
         params.set("e", ep.episode);
       }
       return `https://multiembed.mov/?${params.toString()}`;
+    }
+  },
+  {
+    id: "vidlink",
+    name: "VidLink",
+    buildUrl: (ctx) => {
+      if (ctx.mediaType === "movie") {
+        return `https://vidlink.pro/movie/${ctx.imdbId}`;
+      }
+      const ep = getEpisode(ctx);
+      return `https://vidlink.pro/tv/${ctx.imdbId}/${ep.season}/${ep.episode}`;
+    }
+  },
+  {
+    id: "nontongo",
+    name: "NontonGo",
+    buildUrl: (ctx) => {
+      if (ctx.mediaType === "movie") {
+        return `https://www.NontonGo.net/embed/movie/${ctx.imdbId}`;
+      }
+      const ep = getEpisode(ctx);
+      return `https://www.NontonGo.net/embed/tv/${ctx.imdbId}/${ep.season}/${ep.episode}`;
+    }
+  },
+  {
+    id: "vidsrc-xyz",
+    name: "VidSrc.xyz",
+    buildUrl: (ctx) => {
+      if (ctx.mediaType === "movie") {
+        return `https://vidsrc.xyz/embed/movie?imdb=${ctx.imdbId}`;
+      }
+      const ep = getEpisode(ctx);
+      return `https://vidsrc.xyz/embed/tv?imdb=${ctx.imdbId}&season=${ep.season}&episode=${ep.episode}`;
     }
   }
 ];
@@ -486,9 +486,8 @@ function WatchPage() {
                   ref: iframeRef,
                   src: embedUrl,
                   title: title ?? "Stream Player",
-                  allow: "fullscreen; autoplay; encrypted-media",
+                  allow: "autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope; clipboard-write",
                   allowFullScreen: true,
-                  sandbox: "allow-scripts allow-same-origin allow-forms allow-presentation allow-fullscreen allow-popups allow-popups-to-escape-sandbox",
                   className: "absolute inset-0 w-full h-full border-0",
                   "data-ocid": "watch.player_iframe"
                 }

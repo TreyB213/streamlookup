@@ -351,9 +351,8 @@ export default function WatchPage() {
             ref={iframeRef}
             src={embedUrl}
             title={title ?? "Stream Player"}
-            allow="fullscreen; autoplay; encrypted-media"
+            allow="autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope; clipboard-write"
             allowFullScreen
-            sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-fullscreen allow-popups allow-popups-to-escape-sandbox"
             className="absolute inset-0 w-full h-full border-0"
             data-ocid="watch.player_iframe"
           />

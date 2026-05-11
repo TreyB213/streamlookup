@@ -1,4 +1,4 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/HomePage-D5VzJwhZ.js","assets/use-tmdb-C_hsIQsx.js","assets/proxy-Db3Nka8V.js","assets/SearchPage-DxV4wK8J.js","assets/circle-alert-BQvdITG_.js","assets/WatchPage-Iu2RNuKr.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/HomePage-DColTC-z.js","assets/use-tmdb-ZWtCVr1j.js","assets/proxy-B7LpWIzE.js","assets/SearchPage-TWpGpzge.js","assets/circle-alert-oOjoVqHy.js","assets/WatchPage-DF37-PZg.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __typeError = (msg) => {
   throw TypeError(msg);
@@ -26504,9 +26504,9 @@ function Skeleton({ className, ...props }) {
   );
 }
 const SKELETON_3 = [0, 1, 2];
-const HomePage = reactExports.lazy(() => __vitePreload(() => import("./HomePage-D5VzJwhZ.js"), true ? __vite__mapDeps([0,1,2]) : void 0));
-const SearchPage = reactExports.lazy(() => __vitePreload(() => import("./SearchPage-DxV4wK8J.js"), true ? __vite__mapDeps([3,1,4,2]) : void 0));
-const WatchPage = reactExports.lazy(() => __vitePreload(() => import("./WatchPage-Iu2RNuKr.js"), true ? __vite__mapDeps([5,4,2]) : void 0));
+const HomePage = reactExports.lazy(() => __vitePreload(() => import("./HomePage-DColTC-z.js"), true ? __vite__mapDeps([0,1,2]) : void 0));
+const SearchPage = reactExports.lazy(() => __vitePreload(() => import("./SearchPage-TWpGpzge.js"), true ? __vite__mapDeps([3,1,4,2]) : void 0));
+const WatchPage = reactExports.lazy(() => __vitePreload(() => import("./WatchPage-DF37-PZg.js"), true ? __vite__mapDeps([5,4,2]) : void 0));
 const rootRoute = createRootRoute({
   component: () => /* @__PURE__ */ jsxRuntimeExports.jsx(Layout, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
     reactExports.Suspense,
