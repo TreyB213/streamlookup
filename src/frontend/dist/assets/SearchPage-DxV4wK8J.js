@@ -1,41 +1,18 @@
-import { s as searchRoute, u as useNavigate, j as jsxRuntimeExports, d as Search, S as Skeleton, F as Film } from "./index-BFeB_eG2.js";
-import { c as useSearchTMDB, m as motion, g as getImageUrl, T as Tv } from "./proxy-DdlHW-e5.js";
-import { A as ArrowLeft, C as CircleAlert } from "./circle-alert-B8zrBGtH.js";
-import { P as Play, S as Star } from "./star-DkVs49nP.js";
-function isTMDBMovie(item) {
-  return item.media_type === "movie";
-}
-function isTMDBTV(item) {
-  return item.media_type === "tv";
-}
-function getTitle(item) {
-  if (isTMDBMovie(item)) return item.title;
-  if (isTMDBTV(item)) return item.name;
-  return item.name;
-}
-function getYear(item) {
-  var _a, _b;
-  if (isTMDBMovie(item)) return ((_a = item.release_date) == null ? void 0 : _a.slice(0, 4)) ?? "";
-  if (isTMDBTV(item)) return ((_b = item.first_air_date) == null ? void 0 : _b.slice(0, 4)) ?? "";
-  return "";
-}
-function PosterCard({
-  item,
-  index
-}) {
+import { s as searchRoute, u as useNavigate, j as jsxRuntimeExports, d as Search, S as Skeleton, F as Film } from "./index-BPdK22S0.js";
+import { c as useSearchImdb, P as Play } from "./use-tmdb-C_hsIQsx.js";
+import { A as ArrowLeft, C as CircleAlert } from "./circle-alert-BQvdITG_.js";
+import { m as motion, T as Tv } from "./proxy-Db3Nka8V.js";
+function PosterCard({ item, index }) {
   const navigate = useNavigate();
-  const title = getTitle(item);
-  const year = getYear(item);
-  const mediaType = item.media_type;
   function handleWatch() {
     void navigate({
       to: "/watch",
       search: {
-        tt: "",
-        type: mediaType,
-        title,
-        poster: item.poster_path ?? "",
-        tmdbId: String(item.id),
+        tt: item.imdbId,
+        type: item.type,
+        title: item.title,
+        poster: item.posterUrl,
+        tmdbId: void 0,
         season: "1",
         episode: "1"
       }
@@ -55,8 +32,8 @@ function PosterCard({
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             "img",
             {
-              src: getImageUrl(item.poster_path, "w300"),
-              alt: title,
+              src: item.posterUrl || "/assets/images/placeholder.svg",
+              alt: item.title,
               className: "w-full h-full object-cover transition-smooth",
               loading: "lazy"
             }
@@ -69,24 +46,20 @@ function PosterCard({
                 fill: "currentColor"
               }
             ) }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-semibold text-foreground line-clamp-2 leading-tight text-center", children: title }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-[10px] text-muted-foreground text-center mt-0.5", children: year })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-semibold text-foreground line-clamp-2 leading-tight text-center", children: item.title }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-[10px] text-muted-foreground text-center mt-0.5", children: item.year > 0 ? item.year : "" })
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-2 left-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex items-center gap-1 px-1.5 py-0.5 rounded bg-black/70 text-[9px] font-mono uppercase tracking-wider text-secondary", children: mediaType === "tv" ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-2 left-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex items-center gap-1 px-1.5 py-0.5 rounded bg-black/70 text-[9px] font-mono uppercase tracking-wider text-secondary", children: item.type === "tv" ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(Tv, { className: "w-2.5 h-2.5" }),
             " TV"
           ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(Film, { className: "w-2.5 h-2.5" }),
             " Film"
-          ] }) }) }),
-          item.vote_average > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-2 right-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-black/70 text-[9px] font-mono text-secondary", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Star, { className: "w-2.5 h-2.5", fill: "currentColor" }),
-            item.vote_average.toFixed(1)
-          ] }) })
+          ] }) }) })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-2 px-0.5", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-semibold text-foreground truncate leading-tight", children: title }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-[10px] text-muted-foreground mt-0.5", children: year })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-semibold text-foreground truncate leading-tight", children: item.title }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-[10px] text-muted-foreground mt-0.5", children: item.year > 0 ? item.year : "" })
         ] })
       ]
     }
@@ -111,10 +84,8 @@ function PosterGridSkeleton() {
 function SearchPage() {
   const { q } = searchRoute.useSearch();
   const navigate = useNavigate();
-  const { data, isLoading, isError } = useSearchTMDB(q);
-  const results = ((data == null ? void 0 : data.results) ?? []).filter(
-    (r) => r.media_type === "movie" || r.media_type === "tv"
-  );
+  const { data, isLoading, isError } = useSearchImdb(q);
+  const results = data ?? [];
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-h-screen", "data-ocid": "search.page", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-card border-b sticky top-0 z-10", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "container mx-auto px-4 py-4 flex items-center gap-4", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -141,7 +112,7 @@ function SearchPage() {
         ] }) : "Search" })
       ] }),
       data && !isLoading && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "ml-auto text-xs text-muted-foreground font-mono shrink-0", children: [
-        data.total_results.toLocaleString(),
+        data.length.toLocaleString(),
         " results"
       ] })
     ] }) }),
@@ -183,7 +154,7 @@ function SearchPage() {
         {
           className: "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4",
           "data-ocid": "search.results_list",
-          children: results.map((item, i) => /* @__PURE__ */ jsxRuntimeExports.jsx(PosterCard, { item, index: i }, item.id))
+          children: results.map((item, i) => /* @__PURE__ */ jsxRuntimeExports.jsx(PosterCard, { item, index: i }, item.imdbId))
         }
       )
     ] })

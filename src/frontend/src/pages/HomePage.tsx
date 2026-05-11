@@ -2,8 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePopularMovies, usePopularTV, useTrending } from "@/hooks/use-tmdb";
-import { getImageUrl } from "@/lib/tmdb";
-import type { TMDBMovie, TMDBResult, TMDBTVShow } from "@/types";
+import type { ImdbItem } from "@/types";
 import { useNavigate } from "@tanstack/react-router";
 import {
   AlertTriangle,
@@ -11,44 +10,26 @@ import {
   ChevronRight,
   Film as FilmIcon,
   Play,
-  Star,
   TrendingUp,
   Tv,
 } from "lucide-react";
 import { motion } from "motion/react";
 import { useCallback, useRef } from "react";
 
-function isTMDBMovie(item: TMDBResult): item is TMDBMovie {
-  return item.media_type === "movie";
-}
-function isTMDBTV(item: TMDBResult): item is TMDBTVShow {
-  return item.media_type === "tv";
-}
-function getTitle(item: TMDBResult): string {
-  if (isTMDBMovie(item)) return item.title;
-  if (isTMDBTV(item)) return item.name;
-  return "";
-}
-function getYear(item: TMDBResult): string {
-  if (isTMDBMovie(item)) return item.release_date?.slice(0, 4) ?? "";
-  if (isTMDBTV(item)) return item.first_air_date?.slice(0, 4) ?? "";
-  return "";
-}
-
 function useWatchNavigate() {
   const navigate = useNavigate();
   return useCallback(
-    (item: TMDBMovie | TMDBTVShow) => {
+    (item: ImdbItem) => {
       void navigate({
         to: "/watch",
         search: {
-          tt: "",
-          type: item.media_type as "movie" | "tv",
+          tt: item.imdbId,
+          type: item.type,
           season: "1",
           episode: "1",
-          title: getTitle(item),
-          poster: item.poster_path ?? undefined,
-          tmdbId: String(item.id),
+          title: item.title,
+          poster: item.posterUrl,
+          tmdbId: undefined,
         },
       });
     },
@@ -66,13 +47,8 @@ function PosterSkeleton() {
   );
 }
 
-function PosterCard({
-  item,
-  index,
-}: { item: TMDBMovie | TMDBTVShow; index: number }) {
+function PosterCard({ item, index }: { item: ImdbItem; index: number }) {
   const goToWatch = useWatchNavigate();
-  const title = getTitle(item);
-  const year = getYear(item);
 
   return (
     <motion.div
@@ -84,16 +60,17 @@ function PosterCard({
       data-ocid={`media_card.item.${index + 1}`}
     >
       <div className="relative overflow-hidden rounded-lg aspect-[2/3] bg-card glow-red-hover scale-on-hover">
-        {item.poster_path ? (
+        {item.posterUrl &&
+        item.posterUrl !== "/assets/images/placeholder.svg" ? (
           <img
-            src={getImageUrl(item.poster_path, "w300")}
-            alt={title}
+            src={item.posterUrl}
+            alt={item.title}
             className="w-full h-full object-cover"
             loading="lazy"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-muted">
-            {item.media_type === "tv" ? (
+            {item.type === "tv" ? (
               <Tv className="w-10 h-10 text-muted-foreground" />
             ) : (
               <FilmIcon className="w-10 h-10 text-muted-foreground" />
@@ -115,31 +92,32 @@ function PosterCard({
             <Play className="w-3 h-3 mr-1 fill-current" /> Watch Now
           </Button>
           <p className="text-[11px] font-semibold text-foreground line-clamp-2 leading-tight">
-            {title}
+            {item.title}
           </p>
-          <div className="flex items-center gap-1 mt-1">
-            <Star className="w-2.5 h-2.5 text-secondary" />
-            <span className="text-[10px] text-secondary font-mono">
-              {item.vote_average.toFixed(1)}
+          {item.year > 0 && (
+            <span className="text-[10px] text-muted-foreground font-mono mt-1">
+              {item.year}
             </span>
-          </div>
+          )}
         </div>
       </div>
 
       {/* Below-card info */}
       <div className="mt-1.5 px-0.5">
         <p className="text-[12px] font-medium text-foreground line-clamp-1 leading-snug">
-          {title}
+          {item.title}
         </p>
         <div className="flex items-center gap-1.5 mt-0.5">
           <Badge
             variant="secondary"
             className="text-[9px] h-4 px-1.5 font-mono uppercase tracking-wider bg-primary/20 text-primary border-0"
           >
-            {item.media_type === "tv" ? "TV" : "MOVIE"}
+            {item.type === "tv" ? "TV" : "MOVIE"}
           </Badge>
-          {year && (
-            <span className="text-[10px] text-muted-foreground">{year}</span>
+          {item.year > 0 && (
+            <span className="text-[10px] text-muted-foreground">
+              {item.year}
+            </span>
           )}
         </div>
       </div>
@@ -183,7 +161,7 @@ function PosterRow({
 }: {
   title: string;
   icon: React.ReactNode;
-  items: (TMDBMovie | TMDBTVShow)[];
+  items: ImdbItem[];
   isLoading: boolean;
   isError?: boolean;
   ocid: string;
@@ -226,7 +204,7 @@ function PosterRow({
             data-ocid={`${ocid}.error_state`}
           >
             <AlertTriangle className="w-4 h-4 text-destructive shrink-0" />
-            <span>Content unavailable. Check your TMDB API key.</span>
+            <span>Content unavailable. Please try again later.</span>
           </div>
         ) : (
           <div
@@ -236,7 +214,7 @@ function PosterRow({
             {isLoading
               ? [0, 1, 2, 3, 4, 5, 6, 7].map((k) => <PosterSkeleton key={k} />)
               : items.map((item, i) => (
-                  <div key={item.id} className="snap-start">
+                  <div key={item.imdbId} className="snap-start">
                     <PosterCard item={item} index={i} />
                   </div>
                 ))}
@@ -247,15 +225,10 @@ function PosterRow({
   );
 }
 
-function HeroSection({ item }: { item: TMDBMovie | TMDBTVShow }) {
+function HeroSection({ item }: { item: ImdbItem }) {
   const goToWatch = useWatchNavigate();
-  const title = getTitle(item);
-  const year = getYear(item);
-  const backdropUrl = item.backdrop_path
-    ? getImageUrl(item.backdrop_path, "original")
-    : item.poster_path
-      ? getImageUrl(item.poster_path, "w780")
-      : null;
+  const hasPoster =
+    item.posterUrl && item.posterUrl !== "/assets/images/placeholder.svg";
 
   return (
     <div
@@ -263,11 +236,10 @@ function HeroSection({ item }: { item: TMDBMovie | TMDBTVShow }) {
       style={{ minHeight: "480px", maxHeight: "640px", height: "56vw" }}
       data-ocid="home.hero_section"
     >
-      {/* Background image */}
-      {backdropUrl ? (
+      {hasPoster ? (
         <img
-          src={backdropUrl}
-          alt={title}
+          src={item.posterUrl}
+          alt={item.title}
           className="absolute inset-0 w-full h-full object-cover object-center"
         />
       ) : null}
@@ -287,8 +259,7 @@ function HeroSection({ item }: { item: TMDBMovie | TMDBTVShow }) {
             "linear-gradient(to top, oklch(0.12 0 0) 0%, oklch(0.12 0 0 / 0.4) 30%, transparent 70%)",
         }}
       />
-      {/* Fallback if no image */}
-      {!backdropUrl && (
+      {!hasPoster && (
         <div
           className="absolute inset-0"
           style={{
@@ -306,37 +277,27 @@ function HeroSection({ item }: { item: TMDBMovie | TMDBTVShow }) {
         className="absolute inset-0 flex flex-col justify-end pb-10 sm:pb-14"
       >
         <div className="container mx-auto px-4 max-w-2xl">
-          {/* Badges row */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <Badge className="bg-primary text-primary-foreground font-mono text-[10px] uppercase tracking-widest border-0 px-2.5">
-              {item.media_type === "tv" ? "Series" : "Movie"}
+              {item.type === "tv" ? "Series" : "Movie"}
             </Badge>
-            {year && (
+            {item.year > 0 && (
               <span className="text-xs text-muted-foreground font-mono">
-                {year}
+                {item.year}
               </span>
             )}
-            <div className="flex items-center gap-1">
-              <Star className="w-3.5 h-3.5 text-secondary fill-secondary" />
-              <span className="text-xs text-secondary font-mono font-bold">
-                {item.vote_average.toFixed(1)}
-              </span>
-            </div>
           </div>
 
-          {/* Title */}
           <h1 className="font-display font-black text-3xl sm:text-5xl md:text-6xl text-foreground leading-none mb-3 drop-shadow-xl">
-            {title}
+            {item.title}
           </h1>
 
-          {/* Overview */}
-          {item.overview && (
+          {item.description && (
             <p className="text-sm sm:text-base text-muted-foreground max-w-xl line-clamp-3 mb-5 leading-relaxed">
-              {item.overview}
+              {item.description}
             </p>
           )}
 
-          {/* CTA */}
           <div className="flex items-center gap-3">
             <Button
               size="lg"
@@ -401,11 +362,7 @@ export default function HomePage() {
     isError: tvError,
   } = usePopularTV();
 
-  const trendingItems = (trending ?? []).filter(
-    (r): r is TMDBMovie | TMDBTVShow =>
-      r.media_type === "movie" || r.media_type === "tv",
-  );
-
+  const trendingItems = trending ?? [];
   const heroItem = trendingItems[0];
 
   return (

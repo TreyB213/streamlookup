@@ -1,4 +1,4 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/HomePage-BAFud-0J.js","assets/proxy-DdlHW-e5.js","assets/star-DkVs49nP.js","assets/SearchPage-vN6u94j2.js","assets/circle-alert-B8zrBGtH.js","assets/WatchPage-C8nCQV4A.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/HomePage-D5VzJwhZ.js","assets/use-tmdb-C_hsIQsx.js","assets/proxy-Db3Nka8V.js","assets/SearchPage-DxV4wK8J.js","assets/circle-alert-BQvdITG_.js","assets/WatchPage-Iu2RNuKr.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __typeError = (msg) => {
   throw TypeError(msg);
@@ -23937,7 +23937,7 @@ function Layout({ children }) {
                 value: searchVal,
                 onChange: (e) => setSearchVal(e.target.value),
                 placeholder: "Search movies, TV shows, or paste IMDb URL…",
-                className: "w-full bg-muted/60 border text-foreground placeholder:text-muted-foreground rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60 transition-smooth",
+                className: "w-full bg-white border border-border/60 text-black placeholder:text-zinc-400 rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60 transition-smooth",
                 "data-ocid": "nav.search_input"
               }
             )
@@ -23959,7 +23959,7 @@ function Layout({ children }) {
                 value: ttInput,
                 onChange: (e) => setTtInput(e.target.value),
                 placeholder: "tt1234567 or IMDb URL",
-                className: "hidden sm:block w-44 bg-muted/60 border text-foreground placeholder:text-muted-foreground rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary/60 transition-smooth",
+                className: "hidden sm:block w-44 bg-white border border-border/60 text-black placeholder:text-zinc-400 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary/60 transition-smooth",
                 "data-ocid": "nav.tt_input"
               }
             ),
@@ -23998,7 +23998,7 @@ function Layout({ children }) {
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-primary", children: "Lookup" })
         ] })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground text-center max-w-md", children: "Search any movie or TV show and stream instantly. Powered by TMDB. Supports 10+ streaming servers with season & episode selection." }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground text-center max-w-md", children: "Search any movie or TV show and stream instantly. Powered by IMDb. Supports 10+ streaming servers with season & episode selection." }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-muted-foreground", children: [
         "© ",
         (/* @__PURE__ */ new Date()).getFullYear(),
@@ -26504,9 +26504,9 @@ function Skeleton({ className, ...props }) {
   );
 }
 const SKELETON_3 = [0, 1, 2];
-const HomePage = reactExports.lazy(() => __vitePreload(() => import("./HomePage-BAFud-0J.js"), true ? __vite__mapDeps([0,1,2]) : void 0));
-const SearchPage = reactExports.lazy(() => __vitePreload(() => import("./SearchPage-vN6u94j2.js"), true ? __vite__mapDeps([3,1,4,2]) : void 0));
-const WatchPage = reactExports.lazy(() => __vitePreload(() => import("./WatchPage-C8nCQV4A.js"), true ? __vite__mapDeps([5,1,4]) : void 0));
+const HomePage = reactExports.lazy(() => __vitePreload(() => import("./HomePage-D5VzJwhZ.js"), true ? __vite__mapDeps([0,1,2]) : void 0));
+const SearchPage = reactExports.lazy(() => __vitePreload(() => import("./SearchPage-DxV4wK8J.js"), true ? __vite__mapDeps([3,1,4,2]) : void 0));
+const WatchPage = reactExports.lazy(() => __vitePreload(() => import("./WatchPage-Iu2RNuKr.js"), true ? __vite__mapDeps([5,4,2]) : void 0));
 const rootRoute = createRootRoute({
   component: () => /* @__PURE__ */ jsxRuntimeExports.jsx(Layout, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
     reactExports.Suspense,
@@ -26581,7 +26581,7 @@ export {
   timeUntilStale as t,
   useNavigate as u,
   notifyManager as v,
-  watchRoute as w,
-  shouldThrowError as x,
-  useQueryClient as y
+  shouldThrowError as w,
+  useQueryClient as x,
+  watchRoute as y
 };

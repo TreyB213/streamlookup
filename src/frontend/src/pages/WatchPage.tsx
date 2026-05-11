@@ -1,8 +1,6 @@
 import { watchRoute } from "@/App";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useExternalIds } from "@/hooks/use-tmdb";
 import { SERVERS, SERVER_STORAGE_KEY } from "@/lib/servers";
-import { getImageUrl } from "@/lib/tmdb";
 import type { ContentContext, MediaType } from "@/types";
 import { useNavigate } from "@tanstack/react-router";
 import {
@@ -34,16 +32,7 @@ export default function WatchPage() {
   const { tt, type, title, poster } = search;
   const season = search.season ?? "1";
   const episode = search.episode ?? "1";
-  const tmdbId = search.tmdbId;
   const navigate = useNavigate();
-
-  const parsedTmdbId = tmdbId ? Number(tmdbId) : null;
-  const { data: extIds, isLoading: extLoading } = useExternalIds(
-    parsedTmdbId,
-    type,
-  );
-
-  const resolvedTtFromUrl = tt || extIds?.imdb_id || "";
 
   // Manual IMDb input state
   const [inputValue, setInputValue] = useState("");
@@ -51,7 +40,7 @@ export default function WatchPage() {
   const [inputError, setInputError] = useState("");
 
   // Active tt ID: manual override takes precedence over URL param
-  const activeTtId = manualTtId || resolvedTtFromUrl;
+  const activeTtId = manualTtId || tt || "";
 
   // Media type toggle
   const [activeType, setActiveType] = useState<MediaType>(type);
@@ -92,8 +81,7 @@ export default function WatchPage() {
     }
   }, [selectedServer]);
 
-  const isLoadingIds = extLoading && !resolvedTtFromUrl;
-  const hasNoId = !isLoadingIds && !activeTtId;
+  const hasNoId = !activeTtId;
 
   function handleInputSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -128,7 +116,7 @@ export default function WatchPage() {
       <div className="flex items-start gap-4 mb-5">
         {poster && (
           <img
-            src={getImageUrl(poster, "w200")}
+            src={poster}
             alt={title ?? "Poster"}
             className="hidden sm:block w-24 rounded-md shrink-0 border border-border shadow-subtle"
           />
@@ -172,7 +160,7 @@ export default function WatchPage() {
               if (inputError) setInputError("");
             }}
             placeholder="Paste IMDb URL or tt ID (e.g. tt0111161)"
-            className="w-full pl-9 pr-4 py-2.5 bg-card border text-foreground text-sm rounded-xl placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/60 transition-smooth"
+            className="w-full pl-9 pr-4 py-2.5 bg-card border text-black text-sm rounded-xl placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/60 transition-smooth"
             data-ocid="watch.imdb_input"
           />
         </div>
@@ -248,7 +236,7 @@ export default function WatchPage() {
                 max="99"
                 value={activeSeason}
                 onChange={(e) => setActiveSeason(e.target.value)}
-                className="w-16 text-center bg-card border text-foreground rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                className="w-16 text-center bg-card border text-black rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                 data-ocid="watch.season_input"
               />
             </div>
@@ -266,7 +254,7 @@ export default function WatchPage() {
                 max="999"
                 value={activeEpisode}
                 onChange={(e) => setActiveEpisode(e.target.value)}
-                className="w-16 text-center bg-card border text-foreground rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                className="w-16 text-center bg-card border text-black rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                 data-ocid="watch.episode_input"
               />
             </div>
@@ -322,22 +310,6 @@ export default function WatchPage() {
         style={{ paddingBottom: "56.25%" }}
         data-ocid="watch.player_panel"
       >
-        {/* Loading state — waiting for external ID lookup */}
-        {isLoadingIds && (
-          <div
-            className="absolute inset-0 flex flex-col items-center justify-center gap-3"
-            data-ocid="watch.loading_state"
-          >
-            <Skeleton className="w-full h-full rounded-none absolute inset-0" />
-            <div className="relative flex flex-col items-center gap-2">
-              <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-              <p className="text-xs text-muted-foreground">
-                Fetching title info…
-              </p>
-            </div>
-          </div>
-        )}
-
         {/* No ID state */}
         {hasNoId && (
           <div
@@ -360,7 +332,7 @@ export default function WatchPage() {
         )}
 
         {/* Server returned null URL */}
-        {!isLoadingIds && activeTtId && !embedUrl && (
+        {activeTtId && !embedUrl && (
           <div
             className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-muted-foreground"
             data-ocid="watch.server_unavailable_state"
@@ -381,6 +353,7 @@ export default function WatchPage() {
             title={title ?? "Stream Player"}
             allow="fullscreen; autoplay; encrypted-media"
             allowFullScreen
+            sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-fullscreen allow-popups allow-popups-to-escape-sandbox"
             className="absolute inset-0 w-full h-full border-0"
             data-ocid="watch.player_iframe"
           />

@@ -1268,15 +1268,6 @@ video {
 .animate-pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
-@keyframes spin {
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
 .cursor-default {
   cursor: default;
 }
@@ -1497,9 +1488,6 @@ video {
 .border-0 {
   border-width: 0px;
 }
-.border-2 {
-  border-width: 2px;
-}
 .border-\[1\.5px\] {
   border-width: 1.5px;
 }
@@ -1543,6 +1531,10 @@ video {
 }
 .bg-transparent {
   background-color: transparent;
+}
+.bg-white {
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
 }
 .bg-gradient-to-b {
   background-image: linear-gradient(to bottom, var(--tw-gradient-stops));
@@ -1871,6 +1863,10 @@ video {
 .tracking-widest {
   letter-spacing: 0.1em;
 }
+.text-black {
+  --tw-text-opacity: 1;
+  color: rgb(0 0 0 / var(--tw-text-opacity, 1));
+}
 .text-current {
   color: currentColor;
 }
@@ -2189,6 +2185,14 @@ video {
 }
 .file\:font-medium::file-selector-button {
   font-weight: 500;
+}
+.placeholder\:text-zinc-400::-moz-placeholder {
+  --tw-text-opacity: 1;
+  color: rgb(161 161 170 / var(--tw-text-opacity, 1));
+}
+.placeholder\:text-zinc-400::placeholder {
+  --tw-text-opacity: 1;
+  color: rgb(161 161 170 / var(--tw-text-opacity, 1));
 }
 .after\:absolute::after {
   content: var(--tw-content);

@@ -1,590 +1,4 @@
-var __typeError = (msg) => {
-  throw TypeError(msg);
-};
-var __accessCheck = (obj, member, msg) => member.has(obj) || __typeError("Cannot " + msg);
-var __privateGet = (obj, member, getter) => (__accessCheck(obj, member, "read from private field"), getter ? getter.call(obj) : member.get(obj));
-var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot add the same private member more than once") : member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
-var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
-var __privateMethod = (obj, member, method) => (__accessCheck(obj, member, "access private method"), method);
-var _client, _currentQuery, _currentQueryInitialState, _currentResult, _currentResultState, _currentResultOptions, _currentThenable, _selectError, _selectFn, _selectResult, _lastQueryWithDefinedData, _staleTimeoutId, _refetchIntervalId, _currentRefetchInterval, _trackedProps, _QueryObserver_instances, executeFetch_fn, updateStaleTimeout_fn, computeRefetchInterval_fn, updateRefetchInterval_fn, updateTimers_fn, clearStaleTimeout_fn, clearRefetchInterval_fn, updateQuery_fn, notify_fn, _a;
-import { e as Subscribable, p as pendingThenable, f as resolveEnabled, g as shallowEqualObjects, h as resolveStaleTime, n as noop$1, i as environmentManager, k as isValidTimeout, t as timeUntilStale, l as timeoutManager, m as focusManager, o as fetchState, q as replaceData, v as notifyManager, r as reactExports, x as shouldThrowError, y as useQueryClient, c as createLucideIcon, j as jsxRuntimeExports } from "./index-BFeB_eG2.js";
-var QueryObserver = (_a = class extends Subscribable {
-  constructor(client, options) {
-    super();
-    __privateAdd(this, _QueryObserver_instances);
-    __privateAdd(this, _client);
-    __privateAdd(this, _currentQuery);
-    __privateAdd(this, _currentQueryInitialState);
-    __privateAdd(this, _currentResult);
-    __privateAdd(this, _currentResultState);
-    __privateAdd(this, _currentResultOptions);
-    __privateAdd(this, _currentThenable);
-    __privateAdd(this, _selectError);
-    __privateAdd(this, _selectFn);
-    __privateAdd(this, _selectResult);
-    // This property keeps track of the last query with defined data.
-    // It will be used to pass the previous data and query to the placeholder function between renders.
-    __privateAdd(this, _lastQueryWithDefinedData);
-    __privateAdd(this, _staleTimeoutId);
-    __privateAdd(this, _refetchIntervalId);
-    __privateAdd(this, _currentRefetchInterval);
-    __privateAdd(this, _trackedProps, /* @__PURE__ */ new Set());
-    this.options = options;
-    __privateSet(this, _client, client);
-    __privateSet(this, _selectError, null);
-    __privateSet(this, _currentThenable, pendingThenable());
-    this.bindMethods();
-    this.setOptions(options);
-  }
-  bindMethods() {
-    this.refetch = this.refetch.bind(this);
-  }
-  onSubscribe() {
-    if (this.listeners.size === 1) {
-      __privateGet(this, _currentQuery).addObserver(this);
-      if (shouldFetchOnMount(__privateGet(this, _currentQuery), this.options)) {
-        __privateMethod(this, _QueryObserver_instances, executeFetch_fn).call(this);
-      } else {
-        this.updateResult();
-      }
-      __privateMethod(this, _QueryObserver_instances, updateTimers_fn).call(this);
-    }
-  }
-  onUnsubscribe() {
-    if (!this.hasListeners()) {
-      this.destroy();
-    }
-  }
-  shouldFetchOnReconnect() {
-    return shouldFetchOn(
-      __privateGet(this, _currentQuery),
-      this.options,
-      this.options.refetchOnReconnect
-    );
-  }
-  shouldFetchOnWindowFocus() {
-    return shouldFetchOn(
-      __privateGet(this, _currentQuery),
-      this.options,
-      this.options.refetchOnWindowFocus
-    );
-  }
-  destroy() {
-    this.listeners = /* @__PURE__ */ new Set();
-    __privateMethod(this, _QueryObserver_instances, clearStaleTimeout_fn).call(this);
-    __privateMethod(this, _QueryObserver_instances, clearRefetchInterval_fn).call(this);
-    __privateGet(this, _currentQuery).removeObserver(this);
-  }
-  setOptions(options) {
-    const prevOptions = this.options;
-    const prevQuery = __privateGet(this, _currentQuery);
-    this.options = __privateGet(this, _client).defaultQueryOptions(options);
-    if (this.options.enabled !== void 0 && typeof this.options.enabled !== "boolean" && typeof this.options.enabled !== "function" && typeof resolveEnabled(this.options.enabled, __privateGet(this, _currentQuery)) !== "boolean") {
-      throw new Error(
-        "Expected enabled to be a boolean or a callback that returns a boolean"
-      );
-    }
-    __privateMethod(this, _QueryObserver_instances, updateQuery_fn).call(this);
-    __privateGet(this, _currentQuery).setOptions(this.options);
-    if (prevOptions._defaulted && !shallowEqualObjects(this.options, prevOptions)) {
-      __privateGet(this, _client).getQueryCache().notify({
-        type: "observerOptionsUpdated",
-        query: __privateGet(this, _currentQuery),
-        observer: this
-      });
-    }
-    const mounted = this.hasListeners();
-    if (mounted && shouldFetchOptionally(
-      __privateGet(this, _currentQuery),
-      prevQuery,
-      this.options,
-      prevOptions
-    )) {
-      __privateMethod(this, _QueryObserver_instances, executeFetch_fn).call(this);
-    }
-    this.updateResult();
-    if (mounted && (__privateGet(this, _currentQuery) !== prevQuery || resolveEnabled(this.options.enabled, __privateGet(this, _currentQuery)) !== resolveEnabled(prevOptions.enabled, __privateGet(this, _currentQuery)) || resolveStaleTime(this.options.staleTime, __privateGet(this, _currentQuery)) !== resolveStaleTime(prevOptions.staleTime, __privateGet(this, _currentQuery)))) {
-      __privateMethod(this, _QueryObserver_instances, updateStaleTimeout_fn).call(this);
-    }
-    const nextRefetchInterval = __privateMethod(this, _QueryObserver_instances, computeRefetchInterval_fn).call(this);
-    if (mounted && (__privateGet(this, _currentQuery) !== prevQuery || resolveEnabled(this.options.enabled, __privateGet(this, _currentQuery)) !== resolveEnabled(prevOptions.enabled, __privateGet(this, _currentQuery)) || nextRefetchInterval !== __privateGet(this, _currentRefetchInterval))) {
-      __privateMethod(this, _QueryObserver_instances, updateRefetchInterval_fn).call(this, nextRefetchInterval);
-    }
-  }
-  getOptimisticResult(options) {
-    const query = __privateGet(this, _client).getQueryCache().build(__privateGet(this, _client), options);
-    const result = this.createResult(query, options);
-    if (shouldAssignObserverCurrentProperties(this, result)) {
-      __privateSet(this, _currentResult, result);
-      __privateSet(this, _currentResultOptions, this.options);
-      __privateSet(this, _currentResultState, __privateGet(this, _currentQuery).state);
-    }
-    return result;
-  }
-  getCurrentResult() {
-    return __privateGet(this, _currentResult);
-  }
-  trackResult(result, onPropTracked) {
-    return new Proxy(result, {
-      get: (target, key) => {
-        this.trackProp(key);
-        onPropTracked == null ? void 0 : onPropTracked(key);
-        if (key === "promise") {
-          this.trackProp("data");
-          if (!this.options.experimental_prefetchInRender && __privateGet(this, _currentThenable).status === "pending") {
-            __privateGet(this, _currentThenable).reject(
-              new Error(
-                "experimental_prefetchInRender feature flag is not enabled"
-              )
-            );
-          }
-        }
-        return Reflect.get(target, key);
-      }
-    });
-  }
-  trackProp(key) {
-    __privateGet(this, _trackedProps).add(key);
-  }
-  getCurrentQuery() {
-    return __privateGet(this, _currentQuery);
-  }
-  refetch({ ...options } = {}) {
-    return this.fetch({
-      ...options
-    });
-  }
-  fetchOptimistic(options) {
-    const defaultedOptions = __privateGet(this, _client).defaultQueryOptions(options);
-    const query = __privateGet(this, _client).getQueryCache().build(__privateGet(this, _client), defaultedOptions);
-    return query.fetch().then(() => this.createResult(query, defaultedOptions));
-  }
-  fetch(fetchOptions) {
-    return __privateMethod(this, _QueryObserver_instances, executeFetch_fn).call(this, {
-      ...fetchOptions,
-      cancelRefetch: fetchOptions.cancelRefetch ?? true
-    }).then(() => {
-      this.updateResult();
-      return __privateGet(this, _currentResult);
-    });
-  }
-  createResult(query, options) {
-    var _a2;
-    const prevQuery = __privateGet(this, _currentQuery);
-    const prevOptions = this.options;
-    const prevResult = __privateGet(this, _currentResult);
-    const prevResultState = __privateGet(this, _currentResultState);
-    const prevResultOptions = __privateGet(this, _currentResultOptions);
-    const queryChange = query !== prevQuery;
-    const queryInitialState = queryChange ? query.state : __privateGet(this, _currentQueryInitialState);
-    const { state } = query;
-    let newState = { ...state };
-    let isPlaceholderData = false;
-    let data;
-    if (options._optimisticResults) {
-      const mounted = this.hasListeners();
-      const fetchOnMount = !mounted && shouldFetchOnMount(query, options);
-      const fetchOptionally = mounted && shouldFetchOptionally(query, prevQuery, options, prevOptions);
-      if (fetchOnMount || fetchOptionally) {
-        newState = {
-          ...newState,
-          ...fetchState(state.data, query.options)
-        };
-      }
-      if (options._optimisticResults === "isRestoring") {
-        newState.fetchStatus = "idle";
-      }
-    }
-    let { error, errorUpdatedAt, status } = newState;
-    data = newState.data;
-    let skipSelect = false;
-    if (options.placeholderData !== void 0 && data === void 0 && status === "pending") {
-      let placeholderData;
-      if ((prevResult == null ? void 0 : prevResult.isPlaceholderData) && options.placeholderData === (prevResultOptions == null ? void 0 : prevResultOptions.placeholderData)) {
-        placeholderData = prevResult.data;
-        skipSelect = true;
-      } else {
-        placeholderData = typeof options.placeholderData === "function" ? options.placeholderData(
-          (_a2 = __privateGet(this, _lastQueryWithDefinedData)) == null ? void 0 : _a2.state.data,
-          __privateGet(this, _lastQueryWithDefinedData)
-        ) : options.placeholderData;
-      }
-      if (placeholderData !== void 0) {
-        status = "success";
-        data = replaceData(
-          prevResult == null ? void 0 : prevResult.data,
-          placeholderData,
-          options
-        );
-        isPlaceholderData = true;
-      }
-    }
-    if (options.select && data !== void 0 && !skipSelect) {
-      if (prevResult && data === (prevResultState == null ? void 0 : prevResultState.data) && options.select === __privateGet(this, _selectFn)) {
-        data = __privateGet(this, _selectResult);
-      } else {
-        try {
-          __privateSet(this, _selectFn, options.select);
-          data = options.select(data);
-          data = replaceData(prevResult == null ? void 0 : prevResult.data, data, options);
-          __privateSet(this, _selectResult, data);
-          __privateSet(this, _selectError, null);
-        } catch (selectError) {
-          __privateSet(this, _selectError, selectError);
-        }
-      }
-    }
-    if (__privateGet(this, _selectError)) {
-      error = __privateGet(this, _selectError);
-      data = __privateGet(this, _selectResult);
-      errorUpdatedAt = Date.now();
-      status = "error";
-    }
-    const isFetching = newState.fetchStatus === "fetching";
-    const isPending = status === "pending";
-    const isError = status === "error";
-    const isLoading = isPending && isFetching;
-    const hasData = data !== void 0;
-    const result = {
-      status,
-      fetchStatus: newState.fetchStatus,
-      isPending,
-      isSuccess: status === "success",
-      isError,
-      isInitialLoading: isLoading,
-      isLoading,
-      data,
-      dataUpdatedAt: newState.dataUpdatedAt,
-      error,
-      errorUpdatedAt,
-      failureCount: newState.fetchFailureCount,
-      failureReason: newState.fetchFailureReason,
-      errorUpdateCount: newState.errorUpdateCount,
-      isFetched: query.isFetched(),
-      isFetchedAfterMount: newState.dataUpdateCount > queryInitialState.dataUpdateCount || newState.errorUpdateCount > queryInitialState.errorUpdateCount,
-      isFetching,
-      isRefetching: isFetching && !isPending,
-      isLoadingError: isError && !hasData,
-      isPaused: newState.fetchStatus === "paused",
-      isPlaceholderData,
-      isRefetchError: isError && hasData,
-      isStale: isStale(query, options),
-      refetch: this.refetch,
-      promise: __privateGet(this, _currentThenable),
-      isEnabled: resolveEnabled(options.enabled, query) !== false
-    };
-    const nextResult = result;
-    if (this.options.experimental_prefetchInRender) {
-      const hasResultData = nextResult.data !== void 0;
-      const isErrorWithoutData = nextResult.status === "error" && !hasResultData;
-      const finalizeThenableIfPossible = (thenable) => {
-        if (isErrorWithoutData) {
-          thenable.reject(nextResult.error);
-        } else if (hasResultData) {
-          thenable.resolve(nextResult.data);
-        }
-      };
-      const recreateThenable = () => {
-        const pending = __privateSet(this, _currentThenable, nextResult.promise = pendingThenable());
-        finalizeThenableIfPossible(pending);
-      };
-      const prevThenable = __privateGet(this, _currentThenable);
-      switch (prevThenable.status) {
-        case "pending":
-          if (query.queryHash === prevQuery.queryHash) {
-            finalizeThenableIfPossible(prevThenable);
-          }
-          break;
-        case "fulfilled":
-          if (isErrorWithoutData || nextResult.data !== prevThenable.value) {
-            recreateThenable();
-          }
-          break;
-        case "rejected":
-          if (!isErrorWithoutData || nextResult.error !== prevThenable.reason) {
-            recreateThenable();
-          }
-          break;
-      }
-    }
-    return nextResult;
-  }
-  updateResult() {
-    const prevResult = __privateGet(this, _currentResult);
-    const nextResult = this.createResult(__privateGet(this, _currentQuery), this.options);
-    __privateSet(this, _currentResultState, __privateGet(this, _currentQuery).state);
-    __privateSet(this, _currentResultOptions, this.options);
-    if (__privateGet(this, _currentResultState).data !== void 0) {
-      __privateSet(this, _lastQueryWithDefinedData, __privateGet(this, _currentQuery));
-    }
-    if (shallowEqualObjects(nextResult, prevResult)) {
-      return;
-    }
-    __privateSet(this, _currentResult, nextResult);
-    const shouldNotifyListeners = () => {
-      if (!prevResult) {
-        return true;
-      }
-      const { notifyOnChangeProps } = this.options;
-      const notifyOnChangePropsValue = typeof notifyOnChangeProps === "function" ? notifyOnChangeProps() : notifyOnChangeProps;
-      if (notifyOnChangePropsValue === "all" || !notifyOnChangePropsValue && !__privateGet(this, _trackedProps).size) {
-        return true;
-      }
-      const includedProps = new Set(
-        notifyOnChangePropsValue ?? __privateGet(this, _trackedProps)
-      );
-      if (this.options.throwOnError) {
-        includedProps.add("error");
-      }
-      return Object.keys(__privateGet(this, _currentResult)).some((key) => {
-        const typedKey = key;
-        const changed = __privateGet(this, _currentResult)[typedKey] !== prevResult[typedKey];
-        return changed && includedProps.has(typedKey);
-      });
-    };
-    __privateMethod(this, _QueryObserver_instances, notify_fn).call(this, { listeners: shouldNotifyListeners() });
-  }
-  onQueryUpdate() {
-    this.updateResult();
-    if (this.hasListeners()) {
-      __privateMethod(this, _QueryObserver_instances, updateTimers_fn).call(this);
-    }
-  }
-}, _client = new WeakMap(), _currentQuery = new WeakMap(), _currentQueryInitialState = new WeakMap(), _currentResult = new WeakMap(), _currentResultState = new WeakMap(), _currentResultOptions = new WeakMap(), _currentThenable = new WeakMap(), _selectError = new WeakMap(), _selectFn = new WeakMap(), _selectResult = new WeakMap(), _lastQueryWithDefinedData = new WeakMap(), _staleTimeoutId = new WeakMap(), _refetchIntervalId = new WeakMap(), _currentRefetchInterval = new WeakMap(), _trackedProps = new WeakMap(), _QueryObserver_instances = new WeakSet(), executeFetch_fn = function(fetchOptions) {
-  __privateMethod(this, _QueryObserver_instances, updateQuery_fn).call(this);
-  let promise = __privateGet(this, _currentQuery).fetch(
-    this.options,
-    fetchOptions
-  );
-  if (!(fetchOptions == null ? void 0 : fetchOptions.throwOnError)) {
-    promise = promise.catch(noop$1);
-  }
-  return promise;
-}, updateStaleTimeout_fn = function() {
-  __privateMethod(this, _QueryObserver_instances, clearStaleTimeout_fn).call(this);
-  const staleTime = resolveStaleTime(
-    this.options.staleTime,
-    __privateGet(this, _currentQuery)
-  );
-  if (environmentManager.isServer() || __privateGet(this, _currentResult).isStale || !isValidTimeout(staleTime)) {
-    return;
-  }
-  const time2 = timeUntilStale(__privateGet(this, _currentResult).dataUpdatedAt, staleTime);
-  const timeout = time2 + 1;
-  __privateSet(this, _staleTimeoutId, timeoutManager.setTimeout(() => {
-    if (!__privateGet(this, _currentResult).isStale) {
-      this.updateResult();
-    }
-  }, timeout));
-}, computeRefetchInterval_fn = function() {
-  return (typeof this.options.refetchInterval === "function" ? this.options.refetchInterval(__privateGet(this, _currentQuery)) : this.options.refetchInterval) ?? false;
-}, updateRefetchInterval_fn = function(nextInterval) {
-  __privateMethod(this, _QueryObserver_instances, clearRefetchInterval_fn).call(this);
-  __privateSet(this, _currentRefetchInterval, nextInterval);
-  if (environmentManager.isServer() || resolveEnabled(this.options.enabled, __privateGet(this, _currentQuery)) === false || !isValidTimeout(__privateGet(this, _currentRefetchInterval)) || __privateGet(this, _currentRefetchInterval) === 0) {
-    return;
-  }
-  __privateSet(this, _refetchIntervalId, timeoutManager.setInterval(() => {
-    if (this.options.refetchIntervalInBackground || focusManager.isFocused()) {
-      __privateMethod(this, _QueryObserver_instances, executeFetch_fn).call(this);
-    }
-  }, __privateGet(this, _currentRefetchInterval)));
-}, updateTimers_fn = function() {
-  __privateMethod(this, _QueryObserver_instances, updateStaleTimeout_fn).call(this);
-  __privateMethod(this, _QueryObserver_instances, updateRefetchInterval_fn).call(this, __privateMethod(this, _QueryObserver_instances, computeRefetchInterval_fn).call(this));
-}, clearStaleTimeout_fn = function() {
-  if (__privateGet(this, _staleTimeoutId)) {
-    timeoutManager.clearTimeout(__privateGet(this, _staleTimeoutId));
-    __privateSet(this, _staleTimeoutId, void 0);
-  }
-}, clearRefetchInterval_fn = function() {
-  if (__privateGet(this, _refetchIntervalId)) {
-    timeoutManager.clearInterval(__privateGet(this, _refetchIntervalId));
-    __privateSet(this, _refetchIntervalId, void 0);
-  }
-}, updateQuery_fn = function() {
-  const query = __privateGet(this, _client).getQueryCache().build(__privateGet(this, _client), this.options);
-  if (query === __privateGet(this, _currentQuery)) {
-    return;
-  }
-  const prevQuery = __privateGet(this, _currentQuery);
-  __privateSet(this, _currentQuery, query);
-  __privateSet(this, _currentQueryInitialState, query.state);
-  if (this.hasListeners()) {
-    prevQuery == null ? void 0 : prevQuery.removeObserver(this);
-    query.addObserver(this);
-  }
-}, notify_fn = function(notifyOptions) {
-  notifyManager.batch(() => {
-    if (notifyOptions.listeners) {
-      this.listeners.forEach((listener) => {
-        listener(__privateGet(this, _currentResult));
-      });
-    }
-    __privateGet(this, _client).getQueryCache().notify({
-      query: __privateGet(this, _currentQuery),
-      type: "observerResultsUpdated"
-    });
-  });
-}, _a);
-function shouldLoadOnMount(query, options) {
-  return resolveEnabled(options.enabled, query) !== false && query.state.data === void 0 && !(query.state.status === "error" && options.retryOnMount === false);
-}
-function shouldFetchOnMount(query, options) {
-  return shouldLoadOnMount(query, options) || query.state.data !== void 0 && shouldFetchOn(query, options, options.refetchOnMount);
-}
-function shouldFetchOn(query, options, field) {
-  if (resolveEnabled(options.enabled, query) !== false && resolveStaleTime(options.staleTime, query) !== "static") {
-    const value = typeof field === "function" ? field(query) : field;
-    return value === "always" || value !== false && isStale(query, options);
-  }
-  return false;
-}
-function shouldFetchOptionally(query, prevQuery, options, prevOptions) {
-  return (query !== prevQuery || resolveEnabled(prevOptions.enabled, query) === false) && (!options.suspense || query.state.status !== "error") && isStale(query, options);
-}
-function isStale(query, options) {
-  return resolveEnabled(options.enabled, query) !== false && query.isStaleByTime(resolveStaleTime(options.staleTime, query));
-}
-function shouldAssignObserverCurrentProperties(observer2, optimisticResult) {
-  if (!shallowEqualObjects(observer2.getCurrentResult(), optimisticResult)) {
-    return true;
-  }
-  return false;
-}
-var IsRestoringContext = reactExports.createContext(false);
-var useIsRestoring = () => reactExports.useContext(IsRestoringContext);
-IsRestoringContext.Provider;
-function createValue() {
-  let isReset = false;
-  return {
-    clearReset: () => {
-      isReset = false;
-    },
-    reset: () => {
-      isReset = true;
-    },
-    isReset: () => {
-      return isReset;
-    }
-  };
-}
-var QueryErrorResetBoundaryContext = reactExports.createContext(createValue());
-var useQueryErrorResetBoundary = () => reactExports.useContext(QueryErrorResetBoundaryContext);
-var ensurePreventErrorBoundaryRetry = (options, errorResetBoundary, query) => {
-  const throwOnError = (query == null ? void 0 : query.state.error) && typeof options.throwOnError === "function" ? shouldThrowError(options.throwOnError, [query.state.error, query]) : options.throwOnError;
-  if (options.suspense || options.experimental_prefetchInRender || throwOnError) {
-    if (!errorResetBoundary.isReset()) {
-      options.retryOnMount = false;
-    }
-  }
-};
-var useClearResetErrorBoundary = (errorResetBoundary) => {
-  reactExports.useEffect(() => {
-    errorResetBoundary.clearReset();
-  }, [errorResetBoundary]);
-};
-var getHasError = ({
-  result,
-  errorResetBoundary,
-  throwOnError,
-  query,
-  suspense
-}) => {
-  return result.isError && !errorResetBoundary.isReset() && !result.isFetching && query && (suspense && result.data === void 0 || shouldThrowError(throwOnError, [result.error, query]));
-};
-var ensureSuspenseTimers = (defaultedOptions) => {
-  if (defaultedOptions.suspense) {
-    const MIN_SUSPENSE_TIME_MS = 1e3;
-    const clamp2 = (value) => value === "static" ? value : Math.max(value ?? MIN_SUSPENSE_TIME_MS, MIN_SUSPENSE_TIME_MS);
-    const originalStaleTime = defaultedOptions.staleTime;
-    defaultedOptions.staleTime = typeof originalStaleTime === "function" ? (...args) => clamp2(originalStaleTime(...args)) : clamp2(originalStaleTime);
-    if (typeof defaultedOptions.gcTime === "number") {
-      defaultedOptions.gcTime = Math.max(
-        defaultedOptions.gcTime,
-        MIN_SUSPENSE_TIME_MS
-      );
-    }
-  }
-};
-var willFetch = (result, isRestoring) => result.isLoading && result.isFetching && !isRestoring;
-var shouldSuspend = (defaultedOptions, result) => (defaultedOptions == null ? void 0 : defaultedOptions.suspense) && result.isPending;
-var fetchOptimistic = (defaultedOptions, observer2, errorResetBoundary) => observer2.fetchOptimistic(defaultedOptions).catch(() => {
-  errorResetBoundary.clearReset();
-});
-function useBaseQuery(options, Observer, queryClient) {
-  var _a2, _b, _c, _d;
-  const isRestoring = useIsRestoring();
-  const errorResetBoundary = useQueryErrorResetBoundary();
-  const client = useQueryClient();
-  const defaultedOptions = client.defaultQueryOptions(options);
-  (_b = (_a2 = client.getDefaultOptions().queries) == null ? void 0 : _a2._experimental_beforeQuery) == null ? void 0 : _b.call(
-    _a2,
-    defaultedOptions
-  );
-  const query = client.getQueryCache().get(defaultedOptions.queryHash);
-  defaultedOptions._optimisticResults = isRestoring ? "isRestoring" : "optimistic";
-  ensureSuspenseTimers(defaultedOptions);
-  ensurePreventErrorBoundaryRetry(defaultedOptions, errorResetBoundary, query);
-  useClearResetErrorBoundary(errorResetBoundary);
-  const isNewCacheEntry = !client.getQueryCache().get(defaultedOptions.queryHash);
-  const [observer2] = reactExports.useState(
-    () => new Observer(
-      client,
-      defaultedOptions
-    )
-  );
-  const result = observer2.getOptimisticResult(defaultedOptions);
-  const shouldSubscribe = !isRestoring && options.subscribed !== false;
-  reactExports.useSyncExternalStore(
-    reactExports.useCallback(
-      (onStoreChange) => {
-        const unsubscribe = shouldSubscribe ? observer2.subscribe(notifyManager.batchCalls(onStoreChange)) : noop$1;
-        observer2.updateResult();
-        return unsubscribe;
-      },
-      [observer2, shouldSubscribe]
-    ),
-    () => observer2.getCurrentResult(),
-    () => observer2.getCurrentResult()
-  );
-  reactExports.useEffect(() => {
-    observer2.setOptions(defaultedOptions);
-  }, [defaultedOptions, observer2]);
-  if (shouldSuspend(defaultedOptions, result)) {
-    throw fetchOptimistic(defaultedOptions, observer2, errorResetBoundary);
-  }
-  if (getHasError({
-    result,
-    errorResetBoundary,
-    throwOnError: defaultedOptions.throwOnError,
-    query,
-    suspense: defaultedOptions.suspense
-  })) {
-    throw result.error;
-  }
-  (_d = (_c = client.getDefaultOptions().queries) == null ? void 0 : _c._experimental_afterQuery) == null ? void 0 : _d.call(
-    _c,
-    defaultedOptions,
-    result
-  );
-  if (defaultedOptions.experimental_prefetchInRender && !environmentManager.isServer() && willFetch(result, isRestoring)) {
-    const promise = isNewCacheEntry ? (
-      // Fetch immediately on render in order to ensure `.promise` is resolved even if the component is unmounted
-      fetchOptimistic(defaultedOptions, observer2, errorResetBoundary)
-    ) : (
-      // subscribe to the "cache promise" so that we can finalize the currentThenable once data comes in
-      query == null ? void 0 : query.promise
-    );
-    promise == null ? void 0 : promise.catch(noop$1).finally(() => {
-      observer2.updateResult();
-    });
-  }
-  return !defaultedOptions.notifyOnChangeProps ? observer2.trackResult(result) : result;
-}
-function useQuery(options, queryClient) {
-  return useBaseQuery(options, QueryObserver);
-}
+import { c as createLucideIcon, r as reactExports, j as jsxRuntimeExports } from "./index-BPdK22S0.js";
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -596,94 +10,6 @@ const __iconNode = [
   ["rect", { width: "20", height: "15", x: "2", y: "7", rx: "2", key: "1e6viu" }]
 ];
 const Tv = createLucideIcon("tv", __iconNode);
-const TMDB_BASE = "https://api.themoviedb.org/3";
-const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p";
-function getApiKey() {
-  return "";
-}
-function getImageUrl(path, size = "w500") {
-  if (!path) return "/assets/images/placeholder.svg";
-  return `${TMDB_IMAGE_BASE}/${size}${path}`;
-}
-async function tmdbFetch(endpoint, params = {}) {
-  const url = new URL(`${TMDB_BASE}${endpoint}`);
-  url.searchParams.set("api_key", getApiKey());
-  for (const [k, v] of Object.entries(params)) {
-    url.searchParams.set(k, v);
-  }
-  const res = await fetch(url.toString());
-  if (!res.ok) throw new Error(`TMDB ${res.status}: ${endpoint}`);
-  return res.json();
-}
-function fetchTrending() {
-  return tmdbFetch(
-    "/trending/all/week"
-  );
-}
-function fetchPopularMovies() {
-  return tmdbFetch(
-    "/movie/popular"
-  );
-}
-function fetchPopularTV() {
-  return tmdbFetch("/tv/popular");
-}
-function fetchSearchTMDB(query) {
-  return tmdbFetch("/search/multi", {
-    query
-  });
-}
-function fetchExternalIds(tmdbId, mediaType) {
-  return tmdbFetch(
-    `/${mediaType}/${tmdbId}/external_ids`
-  );
-}
-function useTrending() {
-  return useQuery({
-    queryKey: ["trending", "all", "week"],
-    queryFn: async () => {
-      const data = await fetchTrending();
-      return data.results;
-    },
-    staleTime: 5 * 60 * 1e3
-  });
-}
-function usePopularMovies() {
-  return useQuery({
-    queryKey: ["popular", "movies"],
-    queryFn: async () => {
-      const data = await fetchPopularMovies();
-      return data.results;
-    },
-    staleTime: 5 * 60 * 1e3
-  });
-}
-function usePopularTV() {
-  return useQuery({
-    queryKey: ["popular", "tv"],
-    queryFn: async () => {
-      const data = await fetchPopularTV();
-      return data.results;
-    },
-    staleTime: 5 * 60 * 1e3
-  });
-}
-function useSearchTMDB(query) {
-  return useQuery({
-    queryKey: ["search", query],
-    queryFn: () => fetchSearchTMDB(query),
-    enabled: query.trim().length > 0,
-    staleTime: 2 * 60 * 1e3
-  });
-}
-function useExternalIds(tmdbId, mediaType) {
-  return useQuery({
-    queryKey: ["external-ids", mediaType, tmdbId],
-    queryFn: () => fetchExternalIds(tmdbId, mediaType),
-    enabled: tmdbId !== null,
-    staleTime: 10 * 60 * 1e3
-  });
-}
 const LayoutGroupContext = reactExports.createContext({});
 function useConstant(init) {
   const ref = reactExports.useRef(null);
@@ -1125,8 +451,8 @@ const color = {
 };
 const colorRegex = /(?:#[\da-f]{3,8}|(?:rgb|hsl)a?\((?:-?[\d.]+%?[,\s]+){2}-?[\d.]+%?\s*(?:[,/]\s*)?(?:\b\d+(?:\.\d+)?|\.\d+)?%?\))/giu;
 function test(v) {
-  var _a2, _b;
-  return isNaN(v) && typeof v === "string" && (((_a2 = v.match(floatRegex)) == null ? void 0 : _a2.length) || 0) + (((_b = v.match(colorRegex)) == null ? void 0 : _b.length) || 0) > 0;
+  var _a, _b;
+  return isNaN(v) && typeof v === "string" && (((_a = v.match(floatRegex)) == null ? void 0 : _a.length) || 0) + (((_b = v.match(colorRegex)) == null ? void 0 : _b.length) || 0) > 0;
 }
 const NUMBER_TOKEN = "number";
 const COLOR_TOKEN = "color";
@@ -1852,7 +1178,7 @@ class JSAnimation extends WithPromise {
       value: void 0
     };
     this.stop = () => {
-      var _a2, _b;
+      var _a, _b;
       const { motionValue: motionValue2 } = this.options;
       if (motionValue2 && motionValue2.updatedAt !== time.now()) {
         this.tick(time.now());
@@ -1861,7 +1187,7 @@ class JSAnimation extends WithPromise {
       if (this.state === "idle")
         return;
       this.teardown();
-      (_b = (_a2 = this.options).onStop) == null ? void 0 : _b.call(_a2);
+      (_b = (_a = this.options).onStop) == null ? void 0 : _b.call(_a);
     };
     this.options = options;
     this.initAnimation();
@@ -2039,14 +1365,14 @@ class JSAnimation extends WithPromise {
     }
   }
   play() {
-    var _a2, _b;
+    var _a, _b;
     if (this.isStopped)
       return;
     const { driver = frameloopDriver, startTime } = this.options;
     if (!this.driver) {
       this.driver = driver((timestamp) => this.tick(timestamp));
     }
-    (_b = (_a2 = this.options).onPlay) == null ? void 0 : _b.call(_a2);
+    (_b = (_a = this.options).onPlay) == null ? void 0 : _b.call(_a);
     const now2 = this.driver.now();
     if (this.state === "finished") {
       this.updateFinished();
@@ -2076,19 +1402,19 @@ class JSAnimation extends WithPromise {
     this.holdTime = null;
   }
   finish() {
-    var _a2, _b;
+    var _a, _b;
     this.notifyFinished();
     this.teardown();
     this.state = "finished";
-    (_b = (_a2 = this.options).onComplete) == null ? void 0 : _b.call(_a2);
+    (_b = (_a = this.options).onComplete) == null ? void 0 : _b.call(_a);
   }
   cancel() {
-    var _a2, _b;
+    var _a, _b;
     this.holdTime = null;
     this.startTime = 0;
     this.tick(0);
     this.teardown();
-    (_b = (_a2 = this.options).onCancel) == null ? void 0 : _b.call(_a2);
+    (_b = (_a = this.options).onCancel) == null ? void 0 : _b.call(_a);
   }
   teardown() {
     this.state = "idle";
@@ -2106,13 +1432,13 @@ class JSAnimation extends WithPromise {
     return this.tick(sampleTime, true);
   }
   attachTimeline(timeline) {
-    var _a2;
+    var _a;
     if (this.options.allowFlatten) {
       this.options.type = "keyframes";
       this.options.ease = "linear";
       this.initAnimation();
     }
-    (_a2 = this.driver) == null ? void 0 : _a2.stop();
+    (_a = this.driver) == null ? void 0 : _a.stop();
     return timeline.observe(this);
   }
 }
@@ -2275,8 +1601,8 @@ function measureAllKeyframes() {
       const restore = transformsToRestore.get(element);
       if (restore) {
         restore.forEach(([key, value]) => {
-          var _a2;
-          (_a2 = element.getValue(key)) == null ? void 0 : _a2.set(value);
+          var _a;
+          (_a = element.getValue(key)) == null ? void 0 : _a.set(value);
         });
       }
     });
@@ -2500,8 +1826,8 @@ class NativeAnimation extends WithPromise {
     this.animation.pause();
   }
   complete() {
-    var _a2, _b;
-    (_b = (_a2 = this.animation).finish) == null ? void 0 : _b.call(_a2);
+    var _a, _b;
+    (_b = (_a = this.animation).finish) == null ? void 0 : _b.call(_a);
   }
   cancel() {
     try {
@@ -2538,15 +1864,15 @@ class NativeAnimation extends WithPromise {
    * while deferring the commit until the next animation frame.
    */
   commitStyles() {
-    var _a2, _b, _c;
-    const element = (_a2 = this.options) == null ? void 0 : _a2.element;
+    var _a, _b, _c;
+    const element = (_a = this.options) == null ? void 0 : _a.element;
     if (!this.isPseudoElement && (element == null ? void 0 : element.isConnected)) {
       (_c = (_b = this.animation).commitStyles) == null ? void 0 : _c.call(_b);
     }
   }
   get duration() {
-    var _a2, _b;
-    const duration = ((_b = (_a2 = this.animation.effect) == null ? void 0 : _a2.getComputedTiming) == null ? void 0 : _b.call(_a2).duration) || 0;
+    var _a, _b;
+    const duration = ((_b = (_a = this.animation.effect) == null ? void 0 : _a.getComputedTiming) == null ? void 0 : _b.call(_a).duration) || 0;
     return /* @__PURE__ */ millisecondsToSeconds(Number(duration));
   }
   get iterationDuration() {
@@ -2590,9 +1916,9 @@ class NativeAnimation extends WithPromise {
    * Attaches a timeline to the animation, for instance the `ScrollTimeline`.
    */
   attachTimeline({ timeline, rangeStart, rangeEnd, observe }) {
-    var _a2;
+    var _a;
     if (this.allowFlatten) {
-      (_a2 = this.animation.effect) == null ? void 0 : _a2.updateTiming({ easing: "linear" });
+      (_a = this.animation.effect) == null ? void 0 : _a.updateTiming({ easing: "linear" });
     }
     this.animation.onfinish = null;
     if (timeline && supportsScrollTimeline()) {
@@ -2733,9 +2059,9 @@ const colorProperties = /* @__PURE__ */ new Set([
 ]);
 const supportsWaapi = /* @__PURE__ */ memo(() => Object.hasOwnProperty.call(Element.prototype, "animate"));
 function supportsBrowserAnimation(options) {
-  var _a2;
+  var _a;
   const { motionValue: motionValue2, name, repeatDelay, repeatType, damping, type, keyframes: keyframes2 } = options;
-  const subject = (_a2 = motionValue2 == null ? void 0 : motionValue2.owner) == null ? void 0 : _a2.current;
+  const subject = (_a = motionValue2 == null ? void 0 : motionValue2.owner) == null ? void 0 : _a.current;
   if (!(subject instanceof HTMLElement)) {
     return false;
   }
@@ -2753,13 +2079,13 @@ function supportsBrowserAnimation(options) {
 const MAX_RESOLVE_DELAY = 40;
 class AsyncMotionValueAnimation extends WithPromise {
   constructor({ autoplay = true, delay: delay2 = 0, type = "keyframes", repeat = 0, repeatDelay = 0, repeatType = "loop", keyframes: keyframes2, name, motionValue: motionValue2, element, ...options }) {
-    var _a2;
+    var _a;
     super();
     this.stop = () => {
-      var _a3, _b;
+      var _a2, _b;
       if (this._animation) {
         this._animation.stop();
-        (_a3 = this.stopTimeline) == null ? void 0 : _a3.call(this);
+        (_a2 = this.stopTimeline) == null ? void 0 : _a2.call(this);
       }
       (_b = this.keyframeResolver) == null ? void 0 : _b.cancel();
     };
@@ -2778,10 +2104,10 @@ class AsyncMotionValueAnimation extends WithPromise {
     };
     const KeyframeResolver$1 = (element == null ? void 0 : element.KeyframeResolver) || KeyframeResolver;
     this.keyframeResolver = new KeyframeResolver$1(keyframes2, (resolvedKeyframes, finalKeyframe, forced) => this.onKeyframesResolved(resolvedKeyframes, finalKeyframe, optionsWithDefaults, !forced), name, motionValue2, element);
-    (_a2 = this.keyframeResolver) == null ? void 0 : _a2.scheduleResolve();
+    (_a = this.keyframeResolver) == null ? void 0 : _a.scheduleResolve();
   }
   onKeyframesResolved(keyframes2, finalKeyframe, options, sync) {
-    var _a2, _b;
+    var _a, _b;
     this.keyframeResolver = void 0;
     const { name, type, velocity, delay: delay2, isHandoff, onUpdate } = options;
     this.resolvedAt = time.now();
@@ -2803,7 +2129,7 @@ class AsyncMotionValueAnimation extends WithPromise {
       keyframes: keyframes2
     };
     const useWaapi = canAnimateValue && !isHandoff && supportsBrowserAnimation(resolvedOptions);
-    const element = (_b = (_a2 = resolvedOptions.motionValue) == null ? void 0 : _a2.owner) == null ? void 0 : _b.current;
+    const element = (_b = (_a = resolvedOptions.motionValue) == null ? void 0 : _a.owner) == null ? void 0 : _b.current;
     let animation;
     if (useWaapi) {
       try {
@@ -2838,9 +2164,9 @@ class AsyncMotionValueAnimation extends WithPromise {
     });
   }
   get animation() {
-    var _a2;
+    var _a;
     if (!this._animation) {
-      (_a2 = this.keyframeResolver) == null ? void 0 : _a2.resume();
+      (_a = this.keyframeResolver) == null ? void 0 : _a.resume();
       flushKeyframeResolvers();
     }
     return this._animation;
@@ -2887,11 +2213,11 @@ class AsyncMotionValueAnimation extends WithPromise {
     this.animation.complete();
   }
   cancel() {
-    var _a2;
+    var _a;
     if (this._animation) {
       this.animation.cancel();
     }
-    (_a2 = this.keyframeResolver) == null ? void 0 : _a2.cancel();
+    (_a = this.keyframeResolver) == null ? void 0 : _a.cancel();
   }
 }
 function calcChildStagger(children, child, delayChildren, staggerChildren = 0, staggerDirection = 1) {
@@ -3091,7 +2417,7 @@ class MotionValue {
     this.canTrackVelocity = null;
     this.events = {};
     this.updateAndNotify = (v) => {
-      var _a2;
+      var _a;
       const currentTime = time.now();
       if (this.updatedAt !== currentTime) {
         this.setPrevFrameValue();
@@ -3099,7 +2425,7 @@ class MotionValue {
       this.prev = this.current;
       this.setCurrent(v);
       if (this.current !== this.prev) {
-        (_a2 = this.events.change) == null ? void 0 : _a2.notify(this.current);
+        (_a = this.events.change) == null ? void 0 : _a.notify(this.current);
         if (this.dependents) {
           for (const dependent of this.dependents) {
             dependent.dirty();
@@ -3235,8 +2561,8 @@ class MotionValue {
       this.stopPassiveEffect();
   }
   dirty() {
-    var _a2;
-    (_a2 = this.events.change) == null ? void 0 : _a2.notify(this.current);
+    var _a;
+    (_a = this.events.change) == null ? void 0 : _a.notify(this.current);
   }
   addDependent(dependent) {
     if (!this.dependents) {
@@ -3340,8 +2666,8 @@ class MotionValue {
    * @public
    */
   destroy() {
-    var _a2, _b;
-    (_a2 = this.dependents) == null ? void 0 : _a2.clear();
+    var _a, _b;
+    (_a = this.dependents) == null ? void 0 : _a.clear();
     (_b = this.events.destroy) == null ? void 0 : _b.notify();
     this.clearListeners();
     this.stop();
@@ -3458,8 +2784,8 @@ function animateTarget(visualElement, targetAndTransition, { delay: delay2 = 0, 
   return animations2;
 }
 function animateVariant(visualElement, variant, options = {}) {
-  var _a2;
-  const resolved = resolveVariant(visualElement, variant, options.type === "exit" ? (_a2 = visualElement.presenceContext) == null ? void 0 : _a2.custom : void 0);
+  var _a;
+  const resolved = resolveVariant(visualElement, variant, options.type === "exit" ? (_a = visualElement.presenceContext) == null ? void 0 : _a.custom : void 0);
   let { transition = visualElement.getDefaultTransition() || {} } = resolved || {};
   if (options.transitionOverride) {
     transition = options.transitionOverride;
@@ -3764,7 +3090,7 @@ class DOMKeyframesResolver extends KeyframeResolver {
     }
   }
   measureEndState() {
-    var _a2;
+    var _a;
     const { element, name, unresolvedKeyframes } = this;
     if (!element || !element.current)
       return;
@@ -3776,7 +3102,7 @@ class DOMKeyframesResolver extends KeyframeResolver {
     if (finalKeyframe !== null && this.finalKeyframe === void 0) {
       this.finalKeyframe = finalKeyframe;
     }
-    if ((_a2 = this.removedTransforms) == null ? void 0 : _a2.length) {
+    if ((_a = this.removedTransforms) == null ? void 0 : _a.length) {
       this.removedTransforms.forEach(([unsetTransformName, unsetTransformValue]) => {
         element.getValue(unsetTransformName).set(unsetTransformValue);
       });
@@ -4027,8 +3353,8 @@ const getSize = (borderBoxAxis, svgAxis, htmlAxis) => (target, borderBoxSize) =>
 const getWidth = /* @__PURE__ */ getSize("inline", "width", "offsetWidth");
 const getHeight = /* @__PURE__ */ getSize("block", "height", "offsetHeight");
 function notifyTarget({ target, borderBoxSize }) {
-  var _a2;
-  (_a2 = resizeHandlers.get(target)) == null ? void 0 : _a2.forEach((handler) => {
+  var _a;
+  (_a = resizeHandlers.get(target)) == null ? void 0 : _a.forEach((handler) => {
     handler(target, {
       get width() {
         return getWidth(target, borderBoxSize);
@@ -4273,10 +3599,10 @@ class VisualElement {
     }
   }
   mount(instance) {
-    var _a2, _b;
+    var _a, _b;
     if (this.hasBeenMounted) {
       for (const key in this.initialValues) {
-        (_a2 = this.values.get(key)) == null ? void 0 : _a2.jump(this.initialValues[key]);
+        (_a = this.values.get(key)) == null ? void 0 : _a.jump(this.initialValues[key]);
         this.latestValues[key] = this.initialValues[key];
       }
     }
@@ -4305,14 +3631,14 @@ class VisualElement {
     this.hasBeenMounted = true;
   }
   unmount() {
-    var _a2;
+    var _a;
     this.projection && this.projection.unmount();
     cancelFrame(this.notifyUpdate);
     cancelFrame(this.render);
     this.valueSubscriptions.forEach((remove) => remove());
     this.valueSubscriptions.clear();
     this.removeFromVariantTree && this.removeFromVariantTree();
-    (_a2 = this.parent) == null ? void 0 : _a2.removeChild(this);
+    (_a = this.parent) == null ? void 0 : _a.removeChild(this);
     for (const key in this.events) {
       this.events[key].clear();
     }
@@ -4555,11 +3881,11 @@ class VisualElement {
    * props.
    */
   getBaseTarget(key) {
-    var _a2;
+    var _a;
     const { initial } = this.props;
     let valueFromInitial;
     if (typeof initial === "string" || typeof initial === "object") {
-      const variant = resolveVariantFromProps(this.props, initial, (_a2 = this.presenceContext) == null ? void 0 : _a2.custom);
+      const variant = resolveVariantFromProps(this.props, initial, (_a = this.presenceContext) == null ? void 0 : _a.custom);
       if (variant) {
         valueFromInitial = variant[key];
       }
@@ -4684,7 +4010,7 @@ function applyBoxDelta(box, { x, y }) {
 const TREE_SCALE_SNAP_MIN = 0.999999999999;
 const TREE_SCALE_SNAP_MAX = 1.0000000000001;
 function applyTreeDeltas(box, treeScale, treePath, isSharedTransition = false) {
-  var _a2;
+  var _a;
   const treeLength = treePath.length;
   if (!treeLength)
     return;
@@ -4708,7 +4034,7 @@ function applyTreeDeltas(box, treeScale, treePath, isSharedTransition = false) {
       applyBoxDelta(box, delta);
     }
     if (isSharedTransition && hasTransform(node.latestValues)) {
-      transformBox(box, node.latestValues, (_a2 = node.layout) == null ? void 0 : _a2.layoutBox);
+      transformBox(box, node.latestValues, (_a = node.layout) == null ? void 0 : _a.layoutBox);
     }
   }
   if (treeScale.x < TREE_SCALE_SNAP_MAX && treeScale.x > TREE_SCALE_SNAP_MIN) {
@@ -4897,14 +4223,14 @@ function isForcedMotionValue(key, { layout: layout2, layoutId }) {
   return transformProps.has(key) || key.startsWith("origin") || (layout2 || layoutId !== void 0) && (!!scaleCorrectors[key] || key === "opacity");
 }
 function scrapeMotionValuesFromProps$1(props, prevProps, visualElement) {
-  var _a2;
+  var _a;
   const style = props.style;
   const prevStyle = prevProps == null ? void 0 : prevProps.style;
   const newValues = {};
   if (!style)
     return newValues;
   for (const key in style) {
-    if (isMotionValue(style[key]) || prevStyle && isMotionValue(prevStyle[key]) || isForcedMotionValue(key, props) || ((_a2 = visualElement == null ? void 0 : visualElement.getValue(key)) == null ? void 0 : _a2.liveStyle) !== void 0) {
+    if (isMotionValue(style[key]) || prevStyle && isMotionValue(prevStyle[key]) || isForcedMotionValue(key, props) || ((_a = visualElement == null ? void 0 : visualElement.getValue(key)) == null ? void 0 : _a.liveStyle) !== void 0) {
       newValues[key] = style[key];
     }
   }
@@ -4920,9 +4246,9 @@ class HTMLVisualElement extends DOMVisualElement {
     this.renderInstance = renderHTML;
   }
   readValueFromInstance(instance, key) {
-    var _a2;
+    var _a;
     if (transformProps.has(key)) {
-      return ((_a2 = this.projection) == null ? void 0 : _a2.isProjecting) ? defaultTransformValue(key) : readTransformValue(instance, key);
+      return ((_a = this.projection) == null ? void 0 : _a.isProjecting) ? defaultTransformValue(key) : readTransformValue(instance, key);
     } else {
       const computedStyle = getComputedStyle$1(instance);
       const value = (isCSSVariableName(key) ? computedStyle.getPropertyValue(key) : computedStyle[key]) || 0;
@@ -5127,8 +4453,8 @@ function createAnimationState(visualElement) {
   let isInitialRender = true;
   let wasReset = false;
   const buildResolvedTypeValues = (type) => (acc, definition) => {
-    var _a2;
-    const resolved = resolveVariant(visualElement, definition, type === "exit" ? (_a2 = visualElement.presenceContext) == null ? void 0 : _a2.custom : void 0);
+    var _a;
+    const resolved = resolveVariant(visualElement, definition, type === "exit" ? (_a = visualElement.presenceContext) == null ? void 0 : _a.custom : void 0);
     if (resolved) {
       const { transition, transitionEnd, ...target } = resolved;
       acc = { ...acc, ...target, ...transitionEnd };
@@ -5277,12 +4603,12 @@ function createAnimationState(visualElement) {
     return shouldAnimate ? animate(animations2) : Promise.resolve();
   }
   function setActive(type, isActive) {
-    var _a2;
+    var _a;
     if (state[type].isActive === isActive)
       return Promise.resolve();
-    (_a2 = visualElement.variantChildren) == null ? void 0 : _a2.forEach((child) => {
-      var _a3;
-      return (_a3 = child.animationState) == null ? void 0 : _a3.setActive(type, isActive);
+    (_a = visualElement.variantChildren) == null ? void 0 : _a.forEach((child) => {
+      var _a2;
+      return (_a2 = child.animationState) == null ? void 0 : _a2.setActive(type, isActive);
     });
     state[type].isActive = isActive;
     const animations2 = animateChanges(type);
@@ -5605,10 +4931,10 @@ class NodeStack {
     }
   }
   relegate(node) {
-    var _a2;
+    var _a;
     for (let i = this.members.indexOf(node) - 1; i >= 0; i--) {
       const member = this.members[i];
-      if (member.isPresent !== false && ((_a2 = member.instance) == null ? void 0 : _a2.isConnected) !== false) {
+      if (member.isPresent !== false && ((_a = member.instance) == null ? void 0 : _a.isConnected) !== false) {
         this.promote(member);
         return true;
       }
@@ -5616,7 +4942,7 @@ class NodeStack {
     return false;
   }
   promote(node, preserveFollowOpacity) {
-    var _a2;
+    var _a;
     const prevLead = this.lead;
     if (node === prevLead)
       return;
@@ -5636,7 +4962,7 @@ class NodeStack {
           node.snapshot = prevLead.snapshot;
           node.snapshot.latestValues = prevLead.animationValues || prevLead.latestValues;
         }
-        if ((_a2 = node.root) == null ? void 0 : _a2.isUpdating)
+        if ((_a = node.root) == null ? void 0 : _a.isUpdating)
           node.isLayoutDirty = true;
       }
       if (node.options.crossfade === false)
@@ -5645,8 +4971,8 @@ class NodeStack {
   }
   exitAnimationComplete() {
     this.members.forEach((member) => {
-      var _a2, _b, _c, _d, _e;
-      (_b = (_a2 = member.options).onExitComplete) == null ? void 0 : _b.call(_a2);
+      var _a, _b, _c, _d, _e;
+      (_b = (_a = member.options).onExitComplete) == null ? void 0 : _b.call(_a);
       (_e = (_c = member.resumingFrom) == null ? void 0 : (_d = _c.options).onExitComplete) == null ? void 0 : _e.call(_d);
     });
   }
@@ -5654,8 +4980,8 @@ class NodeStack {
     this.members.forEach((member) => member.instance && member.scheduleRender(false));
   }
   removeLeadSnapshot() {
-    var _a2;
-    if ((_a2 = this.lead) == null ? void 0 : _a2.snapshot)
+    var _a;
+    if ((_a = this.lead) == null ? void 0 : _a.snapshot)
       this.lead.snapshot = void 0;
   }
 }
@@ -6063,12 +5389,12 @@ function createProjectionNode$1({ attachResizeListener, defaultParent, measureSc
       };
     }
     measurePageBox() {
-      var _a2;
+      var _a;
       const { visualElement } = this.options;
       if (!visualElement)
         return createBox();
       const box = visualElement.measureViewportBox();
-      const wasInScrollRoot = ((_a2 = this.scroll) == null ? void 0 : _a2.wasRoot) || this.path.some(checkNodeWasScrollRoot);
+      const wasInScrollRoot = ((_a = this.scroll) == null ? void 0 : _a.wasRoot) || this.path.some(checkNodeWasScrollRoot);
       if (!wasInScrollRoot) {
         const { scroll } = this.root;
         if (scroll) {
@@ -6079,10 +5405,10 @@ function createProjectionNode$1({ attachResizeListener, defaultParent, measureSc
       return box;
     }
     removeElementScroll(box) {
-      var _a2;
+      var _a;
       const boxWithoutScroll = createBox();
       copyBoxInto(boxWithoutScroll, box);
-      if ((_a2 = this.scroll) == null ? void 0 : _a2.wasRoot) {
+      if ((_a = this.scroll) == null ? void 0 : _a.wasRoot) {
         return boxWithoutScroll;
       }
       for (let i = 0; i < this.path.length; i++) {
@@ -6099,7 +5425,7 @@ function createProjectionNode$1({ attachResizeListener, defaultParent, measureSc
       return boxWithoutScroll;
     }
     applyTransform(box, transformOnly = false, output) {
-      var _a2, _b;
+      var _a, _b;
       const withTransforms = output || createBox();
       copyBoxInto(withTransforms, box);
       for (let i = 0; i < this.path.length; i++) {
@@ -6110,7 +5436,7 @@ function createProjectionNode$1({ attachResizeListener, defaultParent, measureSc
         }
         if (!hasTransform(node.latestValues))
           continue;
-        transformBox(withTransforms, node.latestValues, (_a2 = node.layout) == null ? void 0 : _a2.layoutBox);
+        transformBox(withTransforms, node.latestValues, (_a = node.layout) == null ? void 0 : _a.layoutBox);
       }
       if (hasTransform(this.latestValues)) {
         transformBox(withTransforms, this.latestValues, (_b = this.layout) == null ? void 0 : _b.layoutBox);
@@ -6118,7 +5444,7 @@ function createProjectionNode$1({ attachResizeListener, defaultParent, measureSc
       return withTransforms;
     }
     removeTransform(box) {
-      var _a2;
+      var _a;
       const boxWithoutTransform = createBox();
       copyBoxInto(boxWithoutTransform, box);
       for (let i = 0; i < this.path.length; i++) {
@@ -6131,7 +5457,7 @@ function createProjectionNode$1({ attachResizeListener, defaultParent, measureSc
           sourceBox = createBox();
           copyBoxInto(sourceBox, node.measurePageBox());
         }
-        removeBoxTransforms(boxWithoutTransform, node.latestValues, (_a2 = node.snapshot) == null ? void 0 : _a2.layoutBox, sourceBox);
+        removeBoxTransforms(boxWithoutTransform, node.latestValues, (_a = node.snapshot) == null ? void 0 : _a.layoutBox, sourceBox);
       }
       if (hasTransform(this.latestValues)) {
         removeBoxTransforms(boxWithoutTransform, this.latestValues);
@@ -6167,13 +5493,13 @@ function createProjectionNode$1({ attachResizeListener, defaultParent, measureSc
       }
     }
     resolveTargetDelta(forceRecalculation = false) {
-      var _a2;
+      var _a;
       const lead = this.getLead();
       this.isProjectionDirty || (this.isProjectionDirty = lead.isProjectionDirty);
       this.isTransformDirty || (this.isTransformDirty = lead.isTransformDirty);
       this.isSharedProjectionDirty || (this.isSharedProjectionDirty = lead.isSharedProjectionDirty);
       const isShared = Boolean(this.resumingFrom) || this !== lead;
-      const canSkip = !(forceRecalculation || isShared && this.isSharedProjectionDirty || this.isProjectionDirty || ((_a2 = this.parent) == null ? void 0 : _a2.isProjectionDirty) || this.attemptToResolveRelativeTarget || this.root.updateBlockedByResize);
+      const canSkip = !(forceRecalculation || isShared && this.isSharedProjectionDirty || this.isProjectionDirty || ((_a = this.parent) == null ? void 0 : _a.isProjectionDirty) || this.attemptToResolveRelativeTarget || this.root.updateBlockedByResize);
       if (canSkip)
         return;
       const { layout: layout2, layoutId } = this.options;
@@ -6245,11 +5571,11 @@ function createProjectionNode$1({ attachResizeListener, defaultParent, measureSc
       this.relativeParent = this.relativeTarget = void 0;
     }
     calcProjection() {
-      var _a2;
+      var _a;
       const lead = this.getLead();
       const isShared = Boolean(this.resumingFrom) || this !== lead;
       let canSkip = true;
-      if (this.isProjectionDirty || ((_a2 = this.parent) == null ? void 0 : _a2.isProjectionDirty)) {
+      if (this.isProjectionDirty || ((_a = this.parent) == null ? void 0 : _a.isProjectionDirty)) {
         canSkip = false;
       }
       if (isShared && (this.isSharedProjectionDirty || this.isTransformDirty)) {
@@ -6303,8 +5629,8 @@ function createProjectionNode$1({ attachResizeListener, defaultParent, measureSc
       this.isVisible = true;
     }
     scheduleRender(notifyAll2 = true) {
-      var _a2;
-      (_a2 = this.options.visualElement) == null ? void 0 : _a2.scheduleRender();
+      var _a;
+      (_a = this.options.visualElement) == null ? void 0 : _a.scheduleRender();
       if (notifyAll2) {
         const stack = this.getStack();
         stack && stack.scheduleRender();
@@ -6362,9 +5688,9 @@ function createProjectionNode$1({ attachResizeListener, defaultParent, measureSc
       this.mixTargetDelta(this.options.layoutRoot ? 1e3 : 0);
     }
     startAnimation(options) {
-      var _a2, _b, _c;
+      var _a, _b, _c;
       this.notifyListeners("animationStart");
-      (_a2 = this.currentAnimation) == null ? void 0 : _a2.stop();
+      (_a = this.currentAnimation) == null ? void 0 : _a.stop();
       (_c = (_b = this.resumingFrom) == null ? void 0 : _b.currentAnimation) == null ? void 0 : _c.stop();
       if (this.pendingAnimation) {
         cancelFrame(this.pendingAnimation);
@@ -6447,14 +5773,14 @@ function createProjectionNode$1({ attachResizeListener, defaultParent, measureSc
       return stack ? stack.lead === this : true;
     }
     getLead() {
-      var _a2;
+      var _a;
       const { layoutId } = this.options;
-      return layoutId ? ((_a2 = this.getStack()) == null ? void 0 : _a2.lead) || this : this;
+      return layoutId ? ((_a = this.getStack()) == null ? void 0 : _a.lead) || this : this;
     }
     getPrevLead() {
-      var _a2;
+      var _a;
       const { layoutId } = this.options;
-      return layoutId ? (_a2 = this.getStack()) == null ? void 0 : _a2.prevLead : void 0;
+      return layoutId ? (_a = this.getStack()) == null ? void 0 : _a.prevLead : void 0;
     }
     getStack() {
       const { layoutId } = this.options;
@@ -6579,8 +5905,8 @@ function createProjectionNode$1({ attachResizeListener, defaultParent, measureSc
     // Only run on root
     resetTree() {
       this.root.nodes.forEach((node) => {
-        var _a2;
-        return (_a2 = node.currentAnimation) == null ? void 0 : _a2.stop();
+        var _a;
+        return (_a = node.currentAnimation) == null ? void 0 : _a.stop();
       });
       this.root.nodes.forEach(clearMeasurements);
       this.root.sharedNodes.clear();
@@ -6591,8 +5917,8 @@ function updateLayout(node) {
   node.updateLayout();
 }
 function notifyLayoutUpdate(node) {
-  var _a2;
-  const snapshot = ((_a2 = node.resumeFrom) == null ? void 0 : _a2.snapshot) || node.snapshot;
+  var _a;
+  const snapshot = ((_a = node.resumeFrom) == null ? void 0 : _a.snapshot) || node.snapshot;
   if (node.isLead() && node.layout && snapshot && node.hasListeners("didUpdate")) {
     const { layoutBox: layout2, measuredBox: measuredLayout } = node.layout;
     const { animationType } = node.options;
@@ -6753,15 +6079,15 @@ function shouldAnimatePositionOnly(animationType, snapshot, layout2) {
   return animationType === "position" || animationType === "preserve-aspect" && !isNear(aspectRatio(snapshot), aspectRatio(layout2), 0.2);
 }
 function checkNodeWasScrollRoot(node) {
-  var _a2;
-  return node !== node.root && ((_a2 = node.scroll) == null ? void 0 : _a2.wasRoot);
+  var _a;
+  return node !== node.root && ((_a = node.scroll) == null ? void 0 : _a.wasRoot);
 }
 const DocumentProjectionNode = createProjectionNode$1({
   attachResizeListener: (ref, notify) => addDomEvent(ref, "resize", notify),
   measureScroll: () => {
-    var _a2, _b;
+    var _a, _b;
     return {
-      x: document.documentElement.scrollLeft || ((_a2 = document.body) == null ? void 0 : _a2.scrollLeft) || 0,
+      x: document.documentElement.scrollLeft || ((_a = document.body) == null ? void 0 : _a.scrollLeft) || 0,
       y: document.documentElement.scrollTop || ((_b = document.body) == null ? void 0 : _b.scrollTop) || 0
     };
   },
@@ -7131,9 +6457,9 @@ function useMotionRef(visualState, visualElement, externalRef) {
   });
   const refCleanup = reactExports.useRef(null);
   return reactExports.useCallback((instance) => {
-    var _a2;
+    var _a;
     if (instance) {
-      (_a2 = visualState.onMount) == null ? void 0 : _a2.call(visualState, instance);
+      (_a = visualState.onMount) == null ? void 0 : _a.call(visualState, instance);
     }
     const ref = externalRefContainer.current;
     if (typeof ref === "function") {
@@ -7161,7 +6487,7 @@ function isRefObject(ref) {
   return ref && typeof ref === "object" && Object.prototype.hasOwnProperty.call(ref, "current");
 }
 function useVisualElement(Component, visualState, props, createVisualElement, ProjectionNodeConstructor, isSVG) {
-  var _a2, _b;
+  var _a, _b;
   const { visualElement: parent } = reactExports.useContext(MotionContext);
   const lazyContext = reactExports.useContext(LazyContext);
   const presenceContext = reactExports.useContext(PresenceContext);
@@ -7198,7 +6524,7 @@ function useVisualElement(Component, visualState, props, createVisualElement, Pr
     }
   });
   const optimisedAppearId = props[optimizedAppearDataAttribute];
-  const wantsHandoff = reactExports.useRef(Boolean(optimisedAppearId) && typeof window !== "undefined" && !((_a2 = window.MotionHandoffIsComplete) == null ? void 0 : _a2.call(window, optimisedAppearId)) && ((_b = window.MotionHasOptimisedAnimation) == null ? void 0 : _b.call(window, optimisedAppearId)));
+  const wantsHandoff = reactExports.useRef(Boolean(optimisedAppearId) && typeof window !== "undefined" && !((_a = window.MotionHandoffIsComplete) == null ? void 0 : _a.call(window, optimisedAppearId)) && ((_b = window.MotionHasOptimisedAnimation) == null ? void 0 : _b.call(window, optimisedAppearId)));
   useIsomorphicLayoutEffect(() => {
     hasMountedOnce.current = true;
     if (!visualElement)
@@ -7219,8 +6545,8 @@ function useVisualElement(Component, visualState, props, createVisualElement, Pr
     }
     if (wantsHandoff.current) {
       queueMicrotask(() => {
-        var _a3;
-        (_a3 = window.MotionHandoffMarkAsComplete) == null ? void 0 : _a3.call(window, optimisedAppearId);
+        var _a2;
+        (_a2 = window.MotionHandoffMarkAsComplete) == null ? void 0 : _a2.call(window, optimisedAppearId);
       });
       wantsHandoff.current = false;
     }
@@ -7364,9 +6690,9 @@ class AnimationFeature extends Feature {
     }
   }
   unmount() {
-    var _a2;
+    var _a;
     this.node.animationState.reset();
-    (_a2 = this.unmountControls) == null ? void 0 : _a2.call(this);
+    (_a = this.unmountControls) == null ? void 0 : _a.call(this);
   }
 }
 let id = 0;
@@ -7377,7 +6703,7 @@ class ExitAnimationFeature extends Feature {
     this.isExitComplete = false;
   }
   update() {
-    var _a2;
+    var _a;
     if (!this.node.presenceContext)
       return;
     const { isPresent, onExitComplete } = this.node.presenceContext;
@@ -7393,7 +6719,7 @@ class ExitAnimationFeature extends Feature {
           if (resolved) {
             const { transition, transitionEnd, ...target } = resolved;
             for (const key in target) {
-              (_a2 = this.node.getValue(key)) == null ? void 0 : _a2.jump(target[key]);
+              (_a = this.node.getValue(key)) == null ? void 0 : _a.jump(target[key]);
             }
           }
         }
@@ -7903,9 +7229,9 @@ class VisualElementDragControls {
     axisValue.set(next);
   }
   resolveConstraints() {
-    var _a2;
+    var _a;
     const { dragConstraints, dragElastic } = this.getProps();
-    const layout2 = this.visualElement.projection && !this.visualElement.projection.layout ? this.visualElement.projection.measure(false) : (_a2 = this.visualElement.projection) == null ? void 0 : _a2.layout;
+    const layout2 = this.visualElement.projection && !this.visualElement.projection.layout ? this.visualElement.projection.measure(false) : (_a = this.visualElement.projection) == null ? void 0 : _a.layout;
     const prevConstraints = this.constraints;
     if (dragConstraints && isRefObject(dragConstraints)) {
       if (!this.constraints) {
@@ -8446,8 +7772,8 @@ class InViewFeature extends Feature {
     this.isInView = false;
   }
   startObserver() {
-    var _a2;
-    (_a2 = this.stopObserver) == null ? void 0 : _a2.call(this);
+    var _a;
+    (_a = this.stopObserver) == null ? void 0 : _a.call(this);
     const { viewport = {} } = this.node.getProps();
     const { root, margin: rootMargin, amount = "some", once } = viewport;
     const options = {
@@ -8487,8 +7813,8 @@ class InViewFeature extends Feature {
     }
   }
   unmount() {
-    var _a2;
-    (_a2 = this.stopObserver) == null ? void 0 : _a2.call(this);
+    var _a;
+    (_a = this.stopObserver) == null ? void 0 : _a.call(this);
     this.hasEnteredView = false;
     this.isInView = false;
   }
@@ -8525,11 +7851,5 @@ const featureBundle = {
 const motion = /* @__PURE__ */ createMotionProxy(featureBundle, createDomVisualElement);
 export {
   Tv as T,
-  usePopularMovies as a,
-  usePopularTV as b,
-  useSearchTMDB as c,
-  useExternalIds as d,
-  getImageUrl as g,
-  motion as m,
-  useTrending as u
+  motion as m
 };

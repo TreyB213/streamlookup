@@ -96,7 +96,7 @@ export function Layout({ children }: LayoutProps) {
                 value={searchVal}
                 onChange={(e) => setSearchVal(e.target.value)}
                 placeholder="Search movies, TV shows, or paste IMDb URL…"
-                className="w-full bg-muted/60 border text-foreground placeholder:text-muted-foreground rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60 transition-smooth"
+                className="w-full bg-white border border-border/60 text-black placeholder:text-zinc-400 rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60 transition-smooth"
                 data-ocid="nav.search_input"
               />
             </div>
@@ -114,7 +114,7 @@ export function Layout({ children }: LayoutProps) {
               value={ttInput}
               onChange={(e) => setTtInput(e.target.value)}
               placeholder="tt1234567 or IMDb URL"
-              className="hidden sm:block w-44 bg-muted/60 border text-foreground placeholder:text-muted-foreground rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary/60 transition-smooth"
+              className="hidden sm:block w-44 bg-white border border-border/60 text-black placeholder:text-zinc-400 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary/60 transition-smooth"
               data-ocid="nav.tt_input"
             />
             <select
@@ -151,7 +151,7 @@ export function Layout({ children }: LayoutProps) {
               </span>
             </div>
             <p className="text-xs text-muted-foreground text-center max-w-md">
-              Search any movie or TV show and stream instantly. Powered by TMDB.
+              Search any movie or TV show and stream instantly. Powered by IMDb.
               Supports 10+ streaming servers with season &amp; episode
               selection.
             </p>

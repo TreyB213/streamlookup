@@ -1,56 +1,36 @@
-const TMDB_BASE = "https://api.themoviedb.org/3";
-const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p";
+import type { ImdbItem } from "../types";
 
-function getApiKey(): string {
-  return import.meta.env.VITE_TMDB_API_KEY ?? "";
+export const POPULAR_MOVIES: { imdbId: string; title: string; year: number }[] =
+  [];
+export const POPULAR_TV: { imdbId: string; title: string; year: number }[] = [];
+
+// Stub — this file is superseded by lib/imdb.ts
+export function getImageUrl(path: string | null | undefined): string {
+  return path ?? "/assets/images/placeholder.svg";
 }
 
-export function getImageUrl(
-  path: string | null | undefined,
-  size: "w200" | "w300" | "w500" | "w780" | "original" = "w500",
-): string {
-  if (!path) return "/assets/images/placeholder.svg";
-  return `${TMDB_IMAGE_BASE}/${size}${path}`;
+export function fetchTrending(): Promise<{ results: ImdbItem[] }> {
+  return Promise.resolve({ results: [] });
 }
-
-async function tmdbFetch<T>(
-  endpoint: string,
-  params: Record<string, string> = {},
-): Promise<T> {
-  const url = new URL(`${TMDB_BASE}${endpoint}`);
-  url.searchParams.set("api_key", getApiKey());
-  for (const [k, v] of Object.entries(params)) {
-    url.searchParams.set(k, v);
-  }
-  const res = await fetch(url.toString());
-  if (!res.ok) throw new Error(`TMDB ${res.status}: ${endpoint}`);
-  return res.json() as Promise<T>;
+export function fetchPopularMovies(): Promise<{ results: ImdbItem[] }> {
+  return Promise.resolve({ results: [] });
 }
-
-export function fetchTrending() {
-  return tmdbFetch<{ results: import("../types").TMDBResult[] }>(
-    "/trending/all/week",
-  );
+export function fetchPopularTV(): Promise<{ results: ImdbItem[] }> {
+  return Promise.resolve({ results: [] });
 }
-
-export function fetchPopularMovies() {
-  return tmdbFetch<{ results: import("../types").TMDBMovie[] }>(
-    "/movie/popular",
-  );
-}
-
-export function fetchPopularTV() {
-  return tmdbFetch<{ results: import("../types").TMDBTVShow[] }>("/tv/popular");
-}
-
-export function fetchSearchTMDB(query: string) {
-  return tmdbFetch<import("../types").TMDBSearchResponse>("/search/multi", {
-    query,
+export function fetchSearchTMDB(): Promise<{
+  results: ImdbItem[];
+  total_results: number;
+  page: number;
+  total_pages: number;
+}> {
+  return Promise.resolve({
+    results: [],
+    total_results: 0,
+    page: 1,
+    total_pages: 0,
   });
 }
-
-export function fetchExternalIds(tmdbId: number, mediaType: "movie" | "tv") {
-  return tmdbFetch<import("../types").TMDBExternalIds>(
-    `/${mediaType}/${tmdbId}/external_ids`,
-  );
+export function fetchExternalIds(): Promise<{ imdb_id: string | null }> {
+  return Promise.resolve({ imdb_id: null });
 }

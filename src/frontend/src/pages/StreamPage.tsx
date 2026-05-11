@@ -350,6 +350,7 @@ export default function StreamPage() {
                   className="absolute inset-0 border-0"
                   referrerPolicy="origin"
                   allowFullScreen
+                  sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-fullscreen"
                   allow="autoplay; encrypted-media; picture-in-picture"
                   title={`Stream ${activeTtId}`}
                   width="100%"

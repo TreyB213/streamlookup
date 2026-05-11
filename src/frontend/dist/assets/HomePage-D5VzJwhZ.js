@@ -1,6 +1,6 @@
-import { c as createLucideIcon, r as reactExports, j as jsxRuntimeExports, R as React, a as clsx, b as cn, F as Film, S as Skeleton, u as useNavigate } from "./index-BFeB_eG2.js";
-import { u as useTrending, a as usePopularMovies, b as usePopularTV, T as Tv, g as getImageUrl, m as motion } from "./proxy-DdlHW-e5.js";
-import { S as Star, P as Play } from "./star-DkVs49nP.js";
+import { c as createLucideIcon, r as reactExports, j as jsxRuntimeExports, R as React, a as clsx, b as cn, F as Film, S as Skeleton, u as useNavigate } from "./index-BPdK22S0.js";
+import { u as useTrending, a as usePopularMovies, b as usePopularTV, P as Play } from "./use-tmdb-C_hsIQsx.js";
+import { T as Tv, m as motion } from "./proxy-Db3Nka8V.js";
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -289,23 +289,6 @@ function Button({
     }
   );
 }
-function isTMDBMovie(item) {
-  return item.media_type === "movie";
-}
-function isTMDBTV(item) {
-  return item.media_type === "tv";
-}
-function getTitle(item) {
-  if (isTMDBMovie(item)) return item.title;
-  if (isTMDBTV(item)) return item.name;
-  return "";
-}
-function getYear(item) {
-  var _a, _b;
-  if (isTMDBMovie(item)) return ((_a = item.release_date) == null ? void 0 : _a.slice(0, 4)) ?? "";
-  if (isTMDBTV(item)) return ((_b = item.first_air_date) == null ? void 0 : _b.slice(0, 4)) ?? "";
-  return "";
-}
 function useWatchNavigate() {
   const navigate = useNavigate();
   return reactExports.useCallback(
@@ -313,13 +296,13 @@ function useWatchNavigate() {
       void navigate({
         to: "/watch",
         search: {
-          tt: "",
-          type: item.media_type,
+          tt: item.imdbId,
+          type: item.type,
           season: "1",
           episode: "1",
-          title: getTitle(item),
-          poster: item.poster_path ?? void 0,
-          tmdbId: String(item.id)
+          title: item.title,
+          poster: item.posterUrl,
+          tmdbId: void 0
         }
       });
     },
@@ -333,13 +316,8 @@ function PosterSkeleton() {
     /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-2 w-1/2 mt-1 rounded" })
   ] });
 }
-function PosterCard({
-  item,
-  index
-}) {
+function PosterCard({ item, index }) {
   const goToWatch = useWatchNavigate();
-  const title = getTitle(item);
-  const year = getYear(item);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     motion.div,
     {
@@ -351,15 +329,15 @@ function PosterCard({
       "data-ocid": `media_card.item.${index + 1}`,
       children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative overflow-hidden rounded-lg aspect-[2/3] bg-card glow-red-hover scale-on-hover", children: [
-          item.poster_path ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+          item.posterUrl && item.posterUrl !== "/assets/images/placeholder.svg" ? /* @__PURE__ */ jsxRuntimeExports.jsx(
             "img",
             {
-              src: getImageUrl(item.poster_path, "w300"),
-              alt: title,
+              src: item.posterUrl,
+              alt: item.title,
               className: "w-full h-full object-cover",
               loading: "lazy"
             }
-          ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-full flex items-center justify-center bg-muted", children: item.media_type === "tv" ? /* @__PURE__ */ jsxRuntimeExports.jsx(Tv, { className: "w-10 h-10 text-muted-foreground" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Film, { className: "w-10 h-10 text-muted-foreground" }) }),
+          ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-full flex items-center justify-center bg-muted", children: item.type === "tv" ? /* @__PURE__ */ jsxRuntimeExports.jsx(Tv, { className: "w-10 h-10 text-muted-foreground" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Film, { className: "w-10 h-10 text-muted-foreground" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 opacity-0 group-hover:opacity-100 transition-smooth flex flex-col justify-end p-2.5", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs(
               Button,
@@ -377,25 +355,22 @@ function PosterCard({
                 ]
               }
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-[11px] font-semibold text-foreground line-clamp-2 leading-tight", children: title }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 mt-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Star, { className: "w-2.5 h-2.5 text-secondary" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] text-secondary font-mono", children: item.vote_average.toFixed(1) })
-            ] })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-[11px] font-semibold text-foreground line-clamp-2 leading-tight", children: item.title }),
+            item.year > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] text-muted-foreground font-mono mt-1", children: item.year })
           ] })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-1.5 px-0.5", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-[12px] font-medium text-foreground line-clamp-1 leading-snug", children: title }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-[12px] font-medium text-foreground line-clamp-1 leading-snug", children: item.title }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1.5 mt-0.5", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               Badge,
               {
                 variant: "secondary",
                 className: "text-[9px] h-4 px-1.5 font-mono uppercase tracking-wider bg-primary/20 text-primary border-0",
-                children: item.media_type === "tv" ? "TV" : "MOVIE"
+                children: item.type === "tv" ? "TV" : "MOVIE"
               }
             ),
-            year && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] text-muted-foreground", children: year })
+            item.year > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] text-muted-foreground", children: item.year })
           ] })
         ] })
       ]
@@ -465,7 +440,7 @@ function PosterRow({
         "data-ocid": `${ocid}.error_state`,
         children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(TriangleAlert, { className: "w-4 h-4 text-destructive shrink-0" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Content unavailable. Check your TMDB API key." })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Content unavailable. Please try again later." })
         ]
       }
     ) : /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -473,16 +448,14 @@ function PosterRow({
       {
         ref: trackRef,
         className: "flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory",
-        children: isLoading ? [0, 1, 2, 3, 4, 5, 6, 7].map((k) => /* @__PURE__ */ jsxRuntimeExports.jsx(PosterSkeleton, {}, k)) : items.map((item, i) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "snap-start", children: /* @__PURE__ */ jsxRuntimeExports.jsx(PosterCard, { item, index: i }) }, item.id))
+        children: isLoading ? [0, 1, 2, 3, 4, 5, 6, 7].map((k) => /* @__PURE__ */ jsxRuntimeExports.jsx(PosterSkeleton, {}, k)) : items.map((item, i) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "snap-start", children: /* @__PURE__ */ jsxRuntimeExports.jsx(PosterCard, { item, index: i }) }, item.imdbId))
       }
     )
   ] }) });
 }
 function HeroSection({ item }) {
   const goToWatch = useWatchNavigate();
-  const title = getTitle(item);
-  const year = getYear(item);
-  const backdropUrl = item.backdrop_path ? getImageUrl(item.backdrop_path, "original") : item.poster_path ? getImageUrl(item.poster_path, "w780") : null;
+  const hasPoster = item.posterUrl && item.posterUrl !== "/assets/images/placeholder.svg";
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "div",
     {
@@ -490,11 +463,11 @@ function HeroSection({ item }) {
       style: { minHeight: "480px", maxHeight: "640px", height: "56vw" },
       "data-ocid": "home.hero_section",
       children: [
-        backdropUrl ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+        hasPoster ? /* @__PURE__ */ jsxRuntimeExports.jsx(
           "img",
           {
-            src: backdropUrl,
-            alt: title,
+            src: item.posterUrl,
+            alt: item.title,
             className: "absolute inset-0 w-full h-full object-cover object-center"
           }
         ) : null,
@@ -516,7 +489,7 @@ function HeroSection({ item }) {
             }
           }
         ),
-        !backdropUrl && /* @__PURE__ */ jsxRuntimeExports.jsx(
+        !hasPoster && /* @__PURE__ */ jsxRuntimeExports.jsx(
           "div",
           {
             className: "absolute inset-0",
@@ -534,15 +507,11 @@ function HeroSection({ item }) {
             className: "absolute inset-0 flex flex-col justify-end pb-10 sm:pb-14",
             children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "container mx-auto px-4 max-w-2xl", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-2 mb-3", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "bg-primary text-primary-foreground font-mono text-[10px] uppercase tracking-widest border-0 px-2.5", children: item.media_type === "tv" ? "Series" : "Movie" }),
-                year && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground font-mono", children: year }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Star, { className: "w-3.5 h-3.5 text-secondary fill-secondary" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-secondary font-mono font-bold", children: item.vote_average.toFixed(1) })
-                ] })
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "bg-primary text-primary-foreground font-mono text-[10px] uppercase tracking-widest border-0 px-2.5", children: item.type === "tv" ? "Series" : "Movie" }),
+                item.year > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground font-mono", children: item.year })
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "font-display font-black text-3xl sm:text-5xl md:text-6xl text-foreground leading-none mb-3 drop-shadow-xl", children: title }),
-              item.overview && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm sm:text-base text-muted-foreground max-w-xl line-clamp-3 mb-5 leading-relaxed", children: item.overview }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "font-display font-black text-3xl sm:text-5xl md:text-6xl text-foreground leading-none mb-3 drop-shadow-xl", children: item.title }),
+              item.description && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm sm:text-base text-muted-foreground max-w-xl line-clamp-3 mb-5 leading-relaxed", children: item.description }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs(
                   Button,
@@ -614,9 +583,7 @@ function HomePage() {
     isLoading: tvLoading,
     isError: tvError
   } = usePopularTV();
-  const trendingItems = (trending ?? []).filter(
-    (r) => r.media_type === "movie" || r.media_type === "tv"
-  );
+  const trendingItems = trending ?? [];
   const heroItem = trendingItems[0];
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-h-screen", "data-ocid": "home.page", children: [
     trendingLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx(HeroSkeleton, {}) : heroItem ? /* @__PURE__ */ jsxRuntimeExports.jsx(HeroSection, { item: heroItem }) : null,

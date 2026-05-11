@@ -1,8 +1,7 @@
 import { searchRoute } from "@/App";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useSearchTMDB } from "@/hooks/use-tmdb";
-import { getImageUrl } from "@/lib/tmdb";
-import type { TMDBMovie, TMDBResult, TMDBTVShow } from "@/types";
+import { useSearchImdb } from "@/hooks/use-tmdb";
+import type { ImdbItem } from "@/types";
 import { useNavigate } from "@tanstack/react-router";
 import {
   AlertCircle,
@@ -10,46 +9,22 @@ import {
   Film as FilmIcon,
   Play,
   Search,
-  Star,
   Tv,
 } from "lucide-react";
 import { motion } from "motion/react";
 
-function isTMDBMovie(item: TMDBResult): item is TMDBMovie {
-  return item.media_type === "movie";
-}
-function isTMDBTV(item: TMDBResult): item is TMDBTVShow {
-  return item.media_type === "tv";
-}
-function getTitle(item: TMDBResult): string {
-  if (isTMDBMovie(item)) return item.title;
-  if (isTMDBTV(item)) return item.name;
-  return item.name;
-}
-function getYear(item: TMDBResult): string {
-  if (isTMDBMovie(item)) return item.release_date?.slice(0, 4) ?? "";
-  if (isTMDBTV(item)) return item.first_air_date?.slice(0, 4) ?? "";
-  return "";
-}
-
-function PosterCard({
-  item,
-  index,
-}: { item: TMDBMovie | TMDBTVShow; index: number }) {
+function PosterCard({ item, index }: { item: ImdbItem; index: number }) {
   const navigate = useNavigate();
-  const title = getTitle(item);
-  const year = getYear(item);
-  const mediaType = item.media_type;
 
   function handleWatch() {
     void navigate({
       to: "/watch",
       search: {
-        tt: "",
-        type: mediaType,
-        title,
-        poster: item.poster_path ?? "",
-        tmdbId: String(item.id),
+        tt: item.imdbId,
+        type: item.type,
+        title: item.title,
+        poster: item.posterUrl,
+        tmdbId: undefined,
         season: "1",
         episode: "1",
       },
@@ -68,8 +43,8 @@ function PosterCard({
       {/* Poster */}
       <div className="relative overflow-hidden rounded-lg aspect-[2/3] bg-card scale-on-hover glow-red-hover">
         <img
-          src={getImageUrl(item.poster_path, "w300")}
-          alt={title}
+          src={item.posterUrl || "/assets/images/placeholder.svg"}
+          alt={item.title}
           className="w-full h-full object-cover transition-smooth"
           loading="lazy"
         />
@@ -85,17 +60,17 @@ function PosterCard({
             </div>
           </div>
           <p className="text-xs font-semibold text-foreground line-clamp-2 leading-tight text-center">
-            {title}
+            {item.title}
           </p>
           <p className="text-[10px] text-muted-foreground text-center mt-0.5">
-            {year}
+            {item.year > 0 ? item.year : ""}
           </p>
         </div>
 
         {/* Media type badge */}
         <div className="absolute top-2 left-2">
           <span className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-black/70 text-[9px] font-mono uppercase tracking-wider text-secondary">
-            {mediaType === "tv" ? (
+            {item.type === "tv" ? (
               <>
                 <Tv className="w-2.5 h-2.5" /> TV
               </>
@@ -106,24 +81,16 @@ function PosterCard({
             )}
           </span>
         </div>
-
-        {/* Rating badge */}
-        {item.vote_average > 0 && (
-          <div className="absolute top-2 right-2">
-            <span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-black/70 text-[9px] font-mono text-secondary">
-              <Star className="w-2.5 h-2.5" fill="currentColor" />
-              {item.vote_average.toFixed(1)}
-            </span>
-          </div>
-        )}
       </div>
 
       {/* Title below poster */}
       <div className="mt-2 px-0.5">
         <p className="text-xs font-semibold text-foreground truncate leading-tight">
-          {title}
+          {item.title}
         </p>
-        <p className="text-[10px] text-muted-foreground mt-0.5">{year}</p>
+        <p className="text-[10px] text-muted-foreground mt-0.5">
+          {item.year > 0 ? item.year : ""}
+        </p>
       </div>
     </motion.div>
   );
@@ -151,12 +118,8 @@ function PosterGridSkeleton() {
 export default function SearchPage() {
   const { q } = searchRoute.useSearch();
   const navigate = useNavigate();
-  const { data, isLoading, isError } = useSearchTMDB(q);
-
-  const results = (data?.results ?? []).filter(
-    (r): r is TMDBMovie | TMDBTVShow =>
-      r.media_type === "movie" || r.media_type === "tv",
-  );
+  const { data, isLoading, isError } = useSearchImdb(q);
+  const results = data ?? [];
 
   return (
     <div className="min-h-screen" data-ocid="search.page">
@@ -189,7 +152,7 @@ export default function SearchPage() {
 
           {data && !isLoading && (
             <span className="ml-auto text-xs text-muted-foreground font-mono shrink-0">
-              {data.total_results.toLocaleString()} results
+              {data.length.toLocaleString()} results
             </span>
           )}
         </div>
@@ -236,7 +199,7 @@ export default function SearchPage() {
             data-ocid="search.results_list"
           >
             {results.map((item, i) => (
-              <PosterCard key={item.id} item={item} index={i} />
+              <PosterCard key={item.imdbId} item={item} index={i} />
             ))}
           </div>
         )}

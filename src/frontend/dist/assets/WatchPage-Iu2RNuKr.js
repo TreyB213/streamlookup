@@ -1,6 +1,6 @@
-import { c as createLucideIcon, w as watchRoute, u as useNavigate, r as reactExports, j as jsxRuntimeExports, F as Film, d as Search, S as Skeleton } from "./index-BFeB_eG2.js";
-import { d as useExternalIds, g as getImageUrl, T as Tv, m as motion } from "./proxy-DdlHW-e5.js";
-import { A as ArrowLeft, C as CircleAlert } from "./circle-alert-B8zrBGtH.js";
+import { c as createLucideIcon, y as watchRoute, u as useNavigate, r as reactExports, j as jsxRuntimeExports, F as Film, d as Search } from "./index-BPdK22S0.js";
+import { A as ArrowLeft, C as CircleAlert } from "./circle-alert-BQvdITG_.js";
+import { T as Tv, m as motion } from "./proxy-Db3Nka8V.js";
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -181,18 +181,11 @@ function WatchPage() {
   const { tt, type, title, poster } = search;
   const season = search.season ?? "1";
   const episode = search.episode ?? "1";
-  const tmdbId = search.tmdbId;
   const navigate = useNavigate();
-  const parsedTmdbId = tmdbId ? Number(tmdbId) : null;
-  const { data: extIds, isLoading: extLoading } = useExternalIds(
-    parsedTmdbId,
-    type
-  );
-  const resolvedTtFromUrl = tt || (extIds == null ? void 0 : extIds.imdb_id) || "";
   const [inputValue, setInputValue] = reactExports.useState("");
   const [manualTtId, setManualTtId] = reactExports.useState("");
   const [inputError, setInputError] = reactExports.useState("");
-  const activeTtId = manualTtId || resolvedTtFromUrl;
+  const activeTtId = manualTtId || tt || "";
   const [activeType, setActiveType] = reactExports.useState(type);
   const [activeSeason, setActiveSeason] = reactExports.useState(season);
   const [activeEpisode, setActiveEpisode] = reactExports.useState(episode);
@@ -220,8 +213,7 @@ function WatchPage() {
     } catch {
     }
   }, [selectedServer]);
-  const isLoadingIds = extLoading && !resolvedTtFromUrl;
-  const hasNoId = !isLoadingIds && !activeTtId;
+  const hasNoId = !activeTtId;
   function handleInputSubmit(e) {
     e.preventDefault();
     const extracted = extractTtId(inputValue);
@@ -257,7 +249,7 @@ function WatchPage() {
           poster && /* @__PURE__ */ jsxRuntimeExports.jsx(
             "img",
             {
-              src: getImageUrl(poster, "w200"),
+              src: poster,
               alt: title ?? "Poster",
               className: "hidden sm:block w-24 rounded-md shrink-0 border border-border shadow-subtle"
             }
@@ -295,7 +287,7 @@ function WatchPage() {
                       if (inputError) setInputError("");
                     },
                     placeholder: "Paste IMDb URL or tt ID (e.g. tt0111161)",
-                    className: "w-full pl-9 pr-4 py-2.5 bg-card border text-foreground text-sm rounded-xl placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/60 transition-smooth",
+                    className: "w-full pl-9 pr-4 py-2.5 bg-card border text-black text-sm rounded-xl placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/60 transition-smooth",
                     "data-ocid": "watch.imdb_input"
                   }
                 )
@@ -372,7 +364,7 @@ function WatchPage() {
                       max: "99",
                       value: activeSeason,
                       onChange: (e) => setActiveSeason(e.target.value),
-                      className: "w-16 text-center bg-card border text-foreground rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+                      className: "w-16 text-center bg-card border text-black rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
                       "data-ocid": "watch.season_input"
                     }
                   )
@@ -395,7 +387,7 @@ function WatchPage() {
                       max: "999",
                       value: activeEpisode,
                       onChange: (e) => setActiveEpisode(e.target.value),
-                      className: "w-16 text-center bg-card border text-foreground rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+                      className: "w-16 text-center bg-card border text-black rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
                       "data-ocid": "watch.episode_input"
                     }
                   )
@@ -455,20 +447,6 @@ function WatchPage() {
             style: { paddingBottom: "56.25%" },
             "data-ocid": "watch.player_panel",
             children: [
-              isLoadingIds && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                "div",
-                {
-                  className: "absolute inset-0 flex flex-col items-center justify-center gap-3",
-                  "data-ocid": "watch.loading_state",
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "w-full h-full rounded-none absolute inset-0" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative flex flex-col items-center gap-2", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground", children: "Fetching title info…" })
-                    ] })
-                  ]
-                }
-              ),
               hasNoId && /* @__PURE__ */ jsxRuntimeExports.jsxs(
                 "div",
                 {
@@ -490,7 +468,7 @@ function WatchPage() {
                   ]
                 }
               ),
-              !isLoadingIds && activeTtId && !embedUrl && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              activeTtId && !embedUrl && /* @__PURE__ */ jsxRuntimeExports.jsxs(
                 "div",
                 {
                   className: "absolute inset-0 flex flex-col items-center justify-center gap-3 text-muted-foreground",
@@ -510,6 +488,7 @@ function WatchPage() {
                   title: title ?? "Stream Player",
                   allow: "fullscreen; autoplay; encrypted-media",
                   allowFullScreen: true,
+                  sandbox: "allow-scripts allow-same-origin allow-forms allow-presentation allow-fullscreen allow-popups allow-popups-to-escape-sandbox",
                   className: "absolute inset-0 w-full h-full border-0",
                   "data-ocid": "watch.player_iframe"
                 }
