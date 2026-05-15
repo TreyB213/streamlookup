@@ -220,7 +220,7 @@ export default function StreamPage() {
                 onChange={(e) => handleInputChange(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleWatch()}
                 placeholder="Paste IMDb URL here... (e.g. https://www.imdb.com/title/tt6263850/)"
-                className="pl-9 pr-9 bg-input border-border text-foreground placeholder:text-muted-foreground font-mono text-sm h-11 focus-visible:ring-ring"
+                className="pl-9 pr-9 bg-input border-border text-black placeholder:text-black font-mono text-sm h-11 focus-visible:ring-ring"
               />
               {inputVal && (
                 <button

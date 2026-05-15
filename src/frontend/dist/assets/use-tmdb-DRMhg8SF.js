@@ -7,7 +7,7 @@ var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot
 var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
 var __privateMethod = (obj, member, method) => (__accessCheck(obj, member, "access private method"), method);
 var _client, _currentQuery, _currentQueryInitialState, _currentResult, _currentResultState, _currentResultOptions, _currentThenable, _selectError, _selectFn, _selectResult, _lastQueryWithDefinedData, _staleTimeoutId, _refetchIntervalId, _currentRefetchInterval, _trackedProps, _QueryObserver_instances, executeFetch_fn, updateStaleTimeout_fn, computeRefetchInterval_fn, updateRefetchInterval_fn, updateTimers_fn, clearStaleTimeout_fn, clearRefetchInterval_fn, updateQuery_fn, notify_fn, _a;
-import { e as Subscribable, p as pendingThenable, f as resolveEnabled, g as shallowEqualObjects, h as resolveStaleTime, n as noop, i as environmentManager, k as isValidTimeout, t as timeUntilStale, l as timeoutManager, m as focusManager, o as fetchState, q as replaceData, v as notifyManager, r as reactExports, w as shouldThrowError, x as useQueryClient, c as createLucideIcon } from "./index-Q3s0jndP.js";
+import { e as Subscribable, p as pendingThenable, f as resolveEnabled, g as shallowEqualObjects, h as resolveStaleTime, n as noop, i as environmentManager, k as isValidTimeout, t as timeUntilStale, l as timeoutManager, m as focusManager, o as fetchState, q as replaceData, v as notifyManager, r as reactExports, w as shouldThrowError, x as useQueryClient, c as createLucideIcon } from "./index-DIzL-gcT.js";
 var QueryObserver = (_a = class extends Subscribable {
   constructor(client, options) {
     super();

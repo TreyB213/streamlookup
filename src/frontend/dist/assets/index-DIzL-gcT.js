@@ -1,4 +1,4 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/HomePage-DColTC-z.js","assets/use-tmdb-ZWtCVr1j.js","assets/proxy-B7LpWIzE.js","assets/SearchPage-TWpGpzge.js","assets/circle-alert-oOjoVqHy.js","assets/WatchPage-DF37-PZg.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/HomePage-Ck0uK4QY.js","assets/use-tmdb-DRMhg8SF.js","assets/proxy-BaXL0pe4.js","assets/SearchPage-DXxjUSuA.js","assets/circle-alert-BZ6ji-KN.js","assets/WatchPage-BeCuoE58.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __typeError = (msg) => {
   throw TypeError(msg);
@@ -23937,7 +23937,7 @@ function Layout({ children }) {
                 value: searchVal,
                 onChange: (e) => setSearchVal(e.target.value),
                 placeholder: "Search movies, TV shows, or paste IMDb URL…",
-                className: "w-full bg-white border border-border/60 text-black placeholder:text-zinc-400 rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60 transition-smooth",
+                className: "w-full bg-white border border-border/60 text-black placeholder:text-black rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60 transition-smooth",
                 "data-ocid": "nav.search_input"
               }
             )
@@ -23959,7 +23959,7 @@ function Layout({ children }) {
                 value: ttInput,
                 onChange: (e) => setTtInput(e.target.value),
                 placeholder: "tt1234567 or IMDb URL",
-                className: "hidden sm:block w-44 bg-white border border-border/60 text-black placeholder:text-zinc-400 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary/60 transition-smooth",
+                className: "hidden sm:block w-44 bg-white border border-border/60 text-black placeholder:text-black rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary/60 transition-smooth",
                 "data-ocid": "nav.tt_input"
               }
             ),
@@ -26504,9 +26504,9 @@ function Skeleton({ className, ...props }) {
   );
 }
 const SKELETON_3 = [0, 1, 2];
-const HomePage = reactExports.lazy(() => __vitePreload(() => import("./HomePage-DColTC-z.js"), true ? __vite__mapDeps([0,1,2]) : void 0));
-const SearchPage = reactExports.lazy(() => __vitePreload(() => import("./SearchPage-TWpGpzge.js"), true ? __vite__mapDeps([3,1,4,2]) : void 0));
-const WatchPage = reactExports.lazy(() => __vitePreload(() => import("./WatchPage-DF37-PZg.js"), true ? __vite__mapDeps([5,4,2]) : void 0));
+const HomePage = reactExports.lazy(() => __vitePreload(() => import("./HomePage-Ck0uK4QY.js"), true ? __vite__mapDeps([0,1,2]) : void 0));
+const SearchPage = reactExports.lazy(() => __vitePreload(() => import("./SearchPage-DXxjUSuA.js"), true ? __vite__mapDeps([3,1,4,2]) : void 0));
+const WatchPage = reactExports.lazy(() => __vitePreload(() => import("./WatchPage-BeCuoE58.js"), true ? __vite__mapDeps([5,4,2]) : void 0));
 const rootRoute = createRootRoute({
   component: () => /* @__PURE__ */ jsxRuntimeExports.jsx(Layout, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
     reactExports.Suspense,

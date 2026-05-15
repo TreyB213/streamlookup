@@ -1,6 +1,6 @@
-import { c as createLucideIcon, y as watchRoute, u as useNavigate, r as reactExports, j as jsxRuntimeExports, F as Film, d as Search } from "./index-Q3s0jndP.js";
-import { A as ArrowLeft, C as CircleAlert } from "./circle-alert-oOjoVqHy.js";
-import { T as Tv, m as motion } from "./proxy-B7LpWIzE.js";
+import { c as createLucideIcon, y as watchRoute, u as useNavigate, r as reactExports, j as jsxRuntimeExports, F as Film, d as Search } from "./index-DIzL-gcT.js";
+import { A as ArrowLeft, C as CircleAlert } from "./circle-alert-BZ6ji-KN.js";
+import { T as Tv, m as motion } from "./proxy-BaXL0pe4.js";
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -287,7 +287,7 @@ function WatchPage() {
                       if (inputError) setInputError("");
                     },
                     placeholder: "Paste IMDb URL or tt ID (e.g. tt0111161)",
-                    className: "w-full pl-9 pr-4 py-2.5 bg-card border text-black text-sm rounded-xl placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/60 transition-smooth",
+                    className: "w-full pl-9 pr-4 py-2.5 bg-card border text-black text-sm rounded-xl placeholder:text-black focus:outline-none focus:ring-2 focus:ring-primary/60 transition-smooth",
                     "data-ocid": "watch.imdb_input"
                   }
                 )

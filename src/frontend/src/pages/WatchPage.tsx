@@ -160,7 +160,7 @@ export default function WatchPage() {
               if (inputError) setInputError("");
             }}
             placeholder="Paste IMDb URL or tt ID (e.g. tt0111161)"
-            className="w-full pl-9 pr-4 py-2.5 bg-card border text-black text-sm rounded-xl placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/60 transition-smooth"
+            className="w-full pl-9 pr-4 py-2.5 bg-card border text-black text-sm rounded-xl placeholder:text-black focus:outline-none focus:ring-2 focus:ring-primary/60 transition-smooth"
             data-ocid="watch.imdb_input"
           />
         </div>
